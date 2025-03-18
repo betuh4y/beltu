@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="./index.js" defer=""></script>
+    <link rel="stylesheet" href="./index.css">
+    <title>Firmino Da Veiga - Site Educacional</title>
+    <script type="text/javascript" src="./index.js" defer=""></script>
+    <link rel="stylesheet" href="./index.css">
+  </head>
+
+  <body>
+    <!-- Página Inicial -->
+    <div id="home-page" class="page">
+      <h1>Bem-vindo ao Firmino Da Veiga!</h1>
+      <p>Este site educacional tem como objetivo ajudar alunos através de videoaulas do YouTube.</p>
+      <p>Explore diversas matérias como Matemática, Física, Português, Inglês e História com aulas selecionadas especialmente para você.</p>
+      <p><strong>Criador do site:</strong> Firmino Da Veiga</p>
+      <p><strong>Como utilizar:</strong> Clique nas categorias para acessar as videoaulas específicas.</p>
+
+      <div class="qrcode">
+        <p>Escaneie o QR Code para acessar o site:</p>
+        <img src="https://i.postimg.cc/yJMz6bt9/frame.png" alt="QR Code do Site">
+      </div>
+
+      <button onclick="enterSite()" class="enter-btn">Entrar</button>
+    </div>
+
+    <!-- Conteúdo Principal -->
+    <main id="main-content" class="page" style="display: none;">
+      <h1>Firmino Da Veiga</h1>
+      <nav class="subject-buttons">
+        <button onclick="goHome()">Início</button>
+        <button onclick="openCategory('Matemática')">Matemática</button>
+        <button onclick="openCategory('Física')">Física</button>
+        <button onclick="openCategory('Português')">Português</button>
+        <button onclick="openCategory('Inglês')">Inglês</button>
+        <button onclick="openCategory('História')">História</button>
+      </nav>
+
+      <!-- Categorias -->
+      <section class="category" id="matemática-section">
+        <h2>Matemática</h2>
+        <div class="video-list" id="matemática-videos"></div>
+      </section>
+
+      <section class="category" id="física-section">
+        <h2>Física</h2>
+        <div class="video-list" id="física-videos"></div>
+      </section>
+
+      <section class="category" id="português-section">
+        <h2>Português</h2>
+        <div class="video-list" id="português-videos"></div>
+      </section>
+
+      <section class="category" id="inglês-section">
+        <h2>Inglês</h2>
+        <div class="video-list" id="inglês-videos"></div>
+      </section>
+
+      <section class="category" id="história-section">
+        <h2>História</h2>
+        <div class="video-list" id="história-videos"></div>
+      </section>
+
+      <section class="category" id="future-category">
+        <h2>Em Breve: Novas Categorias</h2>
+        <p>Estamos adicionando mais matérias em breve!</p>
+      </section>
+    </main>
+
+
+
+  </body>
+
+</html>
