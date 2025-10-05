@@ -1,74 +1,4479 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title> NTE - Site Educacional</title>
-  <link rel="stylesheet" href="./index.css">
-  <script type="text/javascript" src="./index.js" defer></script>
-</head>
+  <head>
+    <meta charset="UTF-8">
+    <title>Sistema de Vendas (PDV) - VIDA SAUDAVEL</title>
+    <link rel="stylesheet" href="./index.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="https://unpkg.com/jspdf-autotable@3.8.0/dist/jspdf.plugin.autotable.js"></script>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
 
-<body>
-  <!-- Página Inicial -->
-  <div id="home-page" class="page">
-    <h1>Bem-vindo ao NTE !</h1>
-    <p>Este site educacional tem como objetivo ajudar alunos através de videoaulas do YouTube.</p>
-    <p>Explore diversas matérias como Matemática, Física, Português, Inglês e História com aulas selecionadas especialmente para você.</p>
-    <p><strong>Criador do site:</strong> NTE</p>
-    <p><strong>Como utilizar:</strong> Clique nas categorias para acessar as videoaulas específicas.</p>
+  header {
+    width: 100%;
+    padding: 20px 0;
+    text-align: center;
+    background-color: #f0f0f0;
+  }
 
-    <div class="qrcode">
-      <p>Escaneie o QR Code para acessar o site:</p>
-      <img src="https://i.postimg.cc/WpG4CyCT/frame-2.png" alt="QR Code do Site">
+  header img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Estilos do PDV existentes */
+  body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #f4f4f4;
+  }
+
+  h2,
+  h3 {
+    color: #333;
+  }
+
+  div {
+    background-color: #fff;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  input[type="email"],
+  input[type="password"],
+  input[type="datetime-local"],
+  input[type="date"],
+  input[type="text"],
+  input[type="number"],
+  select,
+  textarea {
+    width: calc(100% - 22px);
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+
+  select#newProductUnit {
+    width: calc(100% - 22px);
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+
+  button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 5px;
+  }
+
+  button:hover {
+    background-color: #0056b3;
+  }
+
+  #saleList div {
+    border: 1px solid #eee;
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #f9f9f9;
+  }
+
+  .download-buttons button,
+  .report-section button {
+    background-color: #28a745;
+    margin-top: 10px;
+  }
+
+  .download-buttons button:hover,
+  .report-section button:hover {
+    background-color: #218838;
+  }
+
+  .report-section input[type="text"] {
+    width: auto;
+    display: inline-block;
+    margin-right: 10px;
+  }
+
+  .total-sales {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #007bff;
+    margin-top: 15px;
+    text-align: right;
+  }
+
+  .filters {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #f0f8ff;
+  }
+
+  .filters label {
+    margin-right: 10px;
+    font-weight: bold;
+  }
+
+  .filters input,
+  .filters select,
+  .filters button {
+    margin-right: 10px;
+    margin-bottom: 5px;
+  }
+
+  .period-totals {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #e6f7ff;
+    border-radius: 8px;
+    border: 1px solid #b3e0ff;
+  }
+
+  .period-totals div {
+    text-align: center;
+    padding: 10px;
+    flex: 1;
+    background-color: transparent;
+    box-shadow: none;
+  }
+
+  .period-totals strong {
+    display: block;
+    font-size: 1.1em;
+    color: #0056b3;
+    margin-bottom: 5px;
+  }
+
+  .period-totals span {
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #007bff;
+  }
+
+  #activeSaleSection {
+    border: 2px solid #007bff;
+    padding: 20px;
+    margin-top: 20px;
+    background-color: #eaf6ff;
+  }
+
+  #barcodeInput {
+    font-size: 1.2em;
+    padding: 15px;
+    margin-bottom: 15px;
+    border: 2px solid #0056b3;
+  }
+
+  .sale-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px dashed #ccc;
+  }
+
+  .sale-item:last-child {
+    border-bottom: none;
+  }
+
+  .remove-item-btn {
+    background-color: #dc3545;
+    padding: 5px 10px;
+    font-size: 0.8em;
+  }
+
+  .remove-item-btn:hover {
+    background-color: #c82333;
+  }
+
+  #currentSaleTotal {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #007bff;
+    text-align: right;
+    margin-top: 15px;
+  }
+
+  #saleActions button {
+    width: 48%;
+    margin-top: 10px;
+  }
+
+  #cancelSaleBtn {
+    background-color: #6c757d;
+  }
+
+  #cancelSaleBtn:hover {
+    background-color: #5a6268;
+  }
+
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+    padding-top: 60px;
+  }
+
+  .modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+    border-radius: 10px;
+    position: relative;
+  }
+
+  .close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    position: absolute;
+    right: 15px;
+    top: 10px;
+  }
+
+  .close-button:hover,
+  .close-button:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  #amountGivenContainer {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed #eee;
+  }
+
+  #changeDue {
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #28a745;
+    text-align: center;
+    margin-top: 10px;
+  }
+
+  #confirmPaymentBtn {
+    background-color: #28a745;
+    width: 100%;
+    margin-top: 20px;
+    font-size: 1.1em;
+  }
+
+  #productList table,
+  #rankingList table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+
+  #productList th,
+  #productList td,
+  #rankingList th,
+  #rankingList td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+  }
+
+  #productList th,
+  #rankingList th {
+    background-color: #007bff;
+    color: white;
+  }
+
+  #productList tr:nth-child(even),
+  #rankingList tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+
+  #productList tr.low-stock {
+    background-color: #ffe6e6;
+  }
+
+  #productList button {
+    margin-right: 5px;
+    padding: 5px 10px;
+    font-size: 0.9em;
+  }
+
+  #productList button:nth-child(2) {
+    background-color: #dc3545;
+  }
+
+  #productList button:nth-child(2):hover {
+    background-color: #c82333;
+  }
+
+  #toggleProductListBtn {
+    background-color: #6c757d;
+    margin-bottom: 10px;
+  }
+
+  #toggleProductListBtn:hover {
+    background-color: #5a6268;
+  }
+
+  /* Estilos melhorados para a seção de Importação de XML */
+  .xml-container {
+    background-color: #ffffff;
+    border: 1px solid #d0d0d0;
+    padding: 25px;
+    max-width: 1200px;
+    margin: 20px auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+  }
+
+  .xml-header {
+    background-color: #e8f4fd;
+    padding: 15px;
+    margin-bottom: 25px;
+    text-align: center;
+    border-radius: 8px;
+    border: 1px solid #b3d4fc;
+  }
+
+  .xml-header h2 {
+    margin: 0;
+    color: #0056b3;
+  }
+
+  .xml-file-upload {
+    text-align: center;
+    margin-bottom: 25px;
+  }
+
+  .xml-file-upload input[type="file"] {
+    display: block;
+    margin: 0 auto 15px;
+    padding: 10px;
+    border: 1px dashed #007bff;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+  }
+
+  .xml-file-upload button {
+    background-color: #007bff;
+    padding: 12px 25px;
+    font-size: 1em;
+  }
+
+  .xml-fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+
+  .xml-field {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .xml-field label {
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #333;
+  }
+
+  .xml-field input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background-color: #f8f9fa;
+  }
+
+  .xml-section-title {
+    font-size: 1.4em;
+    color: #0056b3;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 5px;
+  }
+
+  .xml-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .xml-table th,
+  .xml-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+  }
+
+  .xml-table th {
+    background-color: #007bff;
+    color: white;
+    font-weight: bold;
+  }
+
+  .xml-table tr:nth-child(even) {
+    background-color: #f8f9fa;
+  }
+
+  .xml-table tr:hover {
+    background-color: #e9ecef;
+  }
+
+  .xml-totals {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+
+  .xml-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 25px;
+  }
+
+  .xml-buttons button {
+    padding: 12px 30px;
+    font-size: 1.1em;
+    border-radius: 6px;
+  }
+
+  .xml-buttons button:first-child {
+    background-color: #28a745;
+  }
+
+  .xml-buttons button:first-child:hover {
+    background-color: #218838;
+  }
+
+  .xml-buttons button:last-child {
+    background-color: #dc3545;
+  }
+
+  .xml-buttons button:last-child:hover {
+    background-color: #c82333;
+  }
+
+  #fileInput {
+    margin-bottom: 20px;
+  }
+
+  .editable {
+    background-color: #fffbe6;
+    width: 100px; /* Aumentado para melhor visualização */
+    padding: 5px;
+  }
+
+  td span {
+    margin-right: 5px;
+  }
+
+  #remaining {
+    font-weight: bold;
+    color: red;
+  }
+
+  .status {
+    font-weight: bold;
+    color: green;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .processed-notes {
+    margin-top: 40px;
+  }
+
+  .note-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+
+  .note-item input[type="checkbox"] {
+    margin-right: 10px;
+  }
+
+  .note-item button {
+    margin-left: auto;
+    margin-right: 5px;
+  }
+
+  .note-item button.delete {
+    background-color: #dc3545;
+  }
+
+  .note-item button.delete:hover {
+    background-color: #c82333;
+  }
+
+  .accounts-payable {
+    margin-top: 40px;
+  }
+
+  .action-buttons {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  #apTable th {
+    cursor: pointer;
+  }
+
+  #apTable th:hover {
+    background-color: #ddd;
+  }
+
+  #noteDetails {
+    display: none;
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+
+  #noteDetails h3 {
+    margin-top: 0;
+  }
+
+  /* Novos estilos para a seção de Contas a Pagar */
+  #apList table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+
+  #apList th,
+  #apList td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+  }
+
+  #apList th {
+    background-color: #007bff;
+    color: white;
+  }
+
+  #apList tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+
+  .ap-item button {
+    margin-right: 5px;
+    padding: 5px 10px;
+    font-size: 0.9em;
+  }
+
+  .ap-item button.edit {
+    background-color: #ffc107;
+  }
+
+  .ap-item button.edit:hover {
+    background-color: #e0a800;
+  }
+
+  .ap-item button.delete {
+    background-color: #dc3545;
+  }
+
+  .ap-item button.delete:hover {
+    background-color: #c82333;
+  }
+
+  .ap-item button.pay {
+    background-color: #28a745;
+  }
+
+  .ap-item button.pay:hover {
+    background-color: #218838;
+  }
+
+  #totalApValue {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #dc3545;
+    margin-top: 15px;
+    text-align: right;
+  }
+
+  #toggleApListBtn {
+    background-color: #6c757d;
+    margin-bottom: 10px;
+  }
+
+  #toggleApListBtn:hover {
+    background-color: #5a6268;
+  }
+
+  /* Estilos para a seção de Inventário */
+  .inventory-container {
+    background-color: #ffffff;
+    border: 1px solid #d0d0d0;
+    padding: 25px;
+    max-width: 1200px;
+    margin: 20px auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+  }
+
+  .inventory-header {
+    background-color: #e8f4fd;
+    padding: 15px;
+    margin-bottom: 25px;
+    text-align: center;
+    border-radius: 8px;
+    border: 1px solid #b3d4fc;
+  }
+
+  .inventory-header h2 {
+    margin: 0;
+    color: #0056b3;
+  }
+
+  #inventoryForm button {
+    background-color: #007bff;
+    padding: 12px 25px;
+    font-size: 1em;
+  }
+
+  #inventoryDetails {
+    display: none;
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+
+  #inventoryDetails h3 {
+    margin-top: 0;
+  }
+
+  .inventory-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+
+  .inventory-item input[type="checkbox"] {
+    margin-right: 10px;
+  }
+
+  .inventory-item button {
+    margin-left: auto;
+    margin-right: 5px;
+  }
+
+  .inventory-item button.delete {
+    background-color: #dc3545;
+  }
+
+  .inventory-item button.delete:hover {
+    background-color: #c82333;
+  }
+
+  /* Novos estilos para desconto/acréscimo */
+  #discountSection {
+    margin-top: 10px;
+    padding: 10px;
+    border-top: 1px solid #ddd;
+  }
+
+  #discountSection input {
+    width: 100px;
+    margin-right: 10px;
+  }
+
+  #discountSection select {
+    margin-right: 10px;
+  }
+
+  /* Estilos aprimorados para gerenciamento de caixa */
+  #cashManagementSection {
+    margin-top: 20px;
+    background-color: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+
+  #cashManagementSection h4 {
+    color: #0056b3;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  #cashManagementSection input[type="text"],
+  #cashManagementSection input[type="number"],
+  #cashManagementSection select {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 15px;
+  }
+
+  #cashManagementSection button {
+    padding: 12px 20px;
+    font-size: 1em;
+    border-radius: 6px;
+    transition: background-color 0.3s ease;
+  }
+
+  #openCashBtn {
+    background-color: #28a745;
+  }
+
+  #openCashBtn:hover {
+    background-color: #218838;
+  }
+
+  #registerCashOperationBtn {
+    background-color: #ffc107;
+  }
+
+  #registerCashOperationBtn:hover {
+    background-color: #e0a800;
+  }
+
+  #closeCashBtn {
+    background-color: #dc3545;
+  }
+
+  #closeCashBtn:hover {
+    background-color: #c82333;
+  }
+
+  #cashOperationsList div {
+    background-color: #e9ecef;
+    border-radius: 6px;
+    padding: 10px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  #closingReportSection {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #e6f7ff;
+    border-radius: 8px;
+    border: 1px solid #b3e0ff;
+  }
+
+  #closingTotals p {
+    font-size: 1.1em;
+    margin-bottom: 10px;
+    color: #333;
+  }
+
+  #cashDifference {
+    font-weight: bold;
+    color: #dc3545;
+  }
+
+  #exportClosingPdfBtn {
+    background-color: #007bff;
+    margin-top: 15px;
+  }
+
+  #exportClosingPdfBtn:hover {
+    background-color: #0056b3;
+  }
+
+  #confirmClosingBtn {
+    background-color: #28a745;
+    margin-top: 15px;
+    margin-right: 10px;
+  }
+
+  #confirmClosingBtn:hover {
+    background-color: #218838;
+  }
+
+  #cancelClosingBtn {
+    background-color: #dc3545;
+    margin-top: 15px;
+  }
+
+  #cancelClosingBtn:hover {
+    background-color: #c82333;
+  }
+
+  /* Estilos para movimentações de caixa */
+  #cashMovList table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+
+  #cashMovList th,
+  #cashMovList td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+  }
+
+  #cashMovList th {
+    background-color: #007bff;
+    color: white;
+  }
+
+  #cashMovList tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+
+  #totalCashMovValue {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #dc3545;
+    margin-top: 15px;
+    text-align: right;
+  }
+
+  #toggleCashListBtn {
+    background-color: #6c757d;
+    margin-bottom: 10px;
+  }
+
+  #toggleCashListBtn:hover {
+    background-color: #5a6268;
+  }
+
+  /* Novos estilos para cadastro de clientes */
+  #customerForm input {
+    width: calc(100% - 22px);
+  }
+
+  #customerList table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  #customerList th,
+  #customerList td {
+    padding: 10px;
+    border: 1px solid #ddd;
+  }
+
+  #customerList th {
+    background-color: #007bff;
+    color: white;
+  }
+
+  #customerList tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+
+  .customer-actions {
+    display: flex;
+    gap: 5px;
+  }
+
+  .whatsapp-icon,
+  .edit-icon {
+    cursor: pointer;
+    font-size: 1.2em;
+  }
+
+  .whatsapp-icon {
+    color: #25D366;
+  }
+
+  .edit-icon {
+    color: #ffc107;
+  }
+
+  #toggleCustomerListBtn {
+    background-color: #6c757d;
+    margin-bottom: 10px;
+  }
+
+  #toggleCustomerListBtn:hover {
+    background-color: #5a6268;
+  }
+
+  /* Novos estilos para contas a receber */
+  #arList table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+
+  #arList th,
+  #arList td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+  }
+
+  #arList th {
+    background-color: #007bff;
+    color: white;
+  }
+
+  #arList tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+
+  .ar-item button {
+    margin-right: 5px;
+    padding: 5px 10px;
+    font-size: 0.9em;
+  }
+
+  .ar-item button.edit {
+    background-color: #ffc107;
+  }
+
+  .ar-item button.edit:hover {
+    background-color: #e0a800;
+  }
+
+  .ar-item button.delete {
+    background-color: #dc3545;
+  }
+
+  .ar-item button.delete:hover {
+    background-color: #c82333;
+  }
+
+  .ar-item button.pay {
+    background-color: #28a745;
+  }
+
+  .ar-item button.pay:hover {
+    background-color: #218838;
+  }
+
+  #totalArValue {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #28a745;
+    margin-top: 15px;
+    text-align: right;
+  }
+
+  #toggleArListBtn {
+    background-color: #6c757d;
+    margin-bottom: 10px;
+  }
+
+  #toggleArListBtn:hover {
+    background-color: #5a6268;
+  }
+
+  /* Novos estilos para cadastro de fornecedores */
+  #supplierForm input {
+    width: calc(100% - 22px);
+  }
+
+  #supplierList table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  #supplierList th,
+  #supplierList td {
+    padding: 10px;
+    border: 1px solid #ddd;
+  }
+
+  #supplierList th {
+    background-color: #007bff;
+    color: white;
+  }
+
+  #supplierList tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+
+  #toggleSupplierListBtn {
+    background-color: #6c757d;
+    margin-bottom: 10px;
+  }
+
+  #toggleSupplierListBtn:hover {
+    background-color: #5a6268;
+  }
+
+  /* Estilos para adição manual de contas a pagar */
+  #addApForm input,
+  #addApForm button {
+    margin-bottom: 10px;
+  }
+</style>
+<script type="text/javascript" src="./index.js" defer=""></script>
+<link rel="stylesheet" href="./index.css">
+<script type="text/javascript" src="./index.js" defer=""></script>
+<link rel="stylesheet" href="./index.css">
+<script type="text/javascript" src="./index.js" defer=""></script>
+<link rel="stylesheet" href="./index.css">  </head>
+
+  <body>
+    <header>
+      <a href="https://ibb.co/7dV11YHH">
+        <img src="https://i.ibb.co/xtG77Cyy/Whats-App-Image-2025-06-22-at-18-08-09.jpg" alt="Whats-App-Image-2025-06-22-at-18-08-09" border="0">
+      </a>
+    </header>
+    <div id="authSection">
+      <h3>Login / Cadastro</h3>
+      <input type="email" id="email" placeholder="Email">
+
+      <input type="password" id="password" placeholder="Senha">
+
+      <button id="registerBtn">Cadastrar</button>
+      <button id="loginBtn">Entrar</button>
+    </div>
+    <div id="saleSection" style="display:none;">
+      <button id="logoutBtn" style="float:right;">Sair</button>
+      <hr>
+      <h3>Nova Venda (PDV)</h3>
+      <div>
+        <label for="barcodeInput">Ler Código de Barras ou Gramatura:</label>
+        <input type="text" id="barcodeInput" placeholder="Ex: 150 * para gramatura ou código do produto" autofocus="">
+        <p>Pressione **Enter** após inserir a gramatura (ex.: 150 *) ou código do produto.</p>
+        <h4>Itens na Venda:</h4>
+        <div id="activeSaleItems">
+          <p>Nenhum item adicionado ainda.</p>
+        </div>
+        <div id="discountSection">
+          <label>Desconto/Acréscimo:</label>
+          <input type="number" id="adjustmentAmount" placeholder="Valor" step="0.01">
+          <select id="adjustmentType">
+            <option value="desconto">Desconto (R$)</option>
+            <option value="descontoPercent">Desconto (%)</option>
+            <option value="acrescimo">Acréscimo (R$)</option>
+            <option value="acrescimoPercent">Acréscimo (%)</option>
+          </select>
+          <button id="applyAdjustmentBtn">Aplicar</button>
+          <p id="adjustmentDisplay">Ajuste aplicado: R$ 0,00</p>
+        </div>
+        <div id="currentSaleTotal">
+          Total: R$ 0,00
+        </div>
+        <div id="saleActions">
+          <button id="finalizarVendaBtn">Finalizar Venda</button>
+          <button id="cancelSaleBtn">Cancelar Venda</button>
+        </div>
+      </div>
+      <div id="paymentModal" class="modal">
+        <div class="modal-content">
+          <span class="close-button">×</span>
+          <h3>Finalizar Venda</h3>
+          <p><strong>Total a Pagar:</strong> <span id="modalTotalValue">R$ 0,00</span></p>
+          <label for="modalPaymentType">Forma de Pagamento:</label>
+          <select id="modalPaymentType">
+            <option value="Pix">Pix</option>
+            <option value="Dinheiro">Dinheiro</option>
+            <option value="Credito">Crédito</option>
+            <option value="Debito">Débito</option>
+            <option value="Outro">Outro</option>
+          </select>
+
+          <div id="amountGivenContainer" style="display:none;">
+            <label for="amountGiven">Valor Recebido (Dinheiro):</label>
+            <input type="number" id="amountGiven" placeholder="Valor que o cliente entregou" step="0.01">
+            <p>Troco: <span id="changeDue">R$ 0,00</span></p>
+          </div>
+          <button id="confirmPaymentBtn">Confirmar Pagamento e Imprimir</button>
+        </div>
+      </div>
+      <hr>
+      <h3>Gerenciamento de Caixa</h3>
+      <div id="cashManagementSection">
+        <h4>Abertura de Caixa</h4>
+        <input type="text" id="openerName" placeholder="Nome do Operador que Abre o Caixa">
+        <input type="number" id="initialCash" placeholder="Suprimento Inicial (R$)" step="0.01">
+        <button id="openCashBtn">Abrir Caixa</button>
+        <h4>Operações de Caixa (Sangria/Suprimento)</h4>
+        <input type="number" id="cashOperationAmount" placeholder="Valor (R$)" step="0.01">
+        <select id="cashOperationType">
+          <option value="sangria">Sangria (Retirada)</option>
+          <option value="suprimento">Suprimento (Adição)</option>
+        </select>
+        <input type="text" id="cashOperationNote" placeholder="Observação">
+        <button id="registerCashOperationBtn">Registrar Operação</button>
+        <div id="cashOperationsList"></div>
+        <h4>Fechamento de Caixa</h4>
+        <input type="text" id="closerName" placeholder="Nome do Operador que Fecha o Caixa">
+        <input type="number" id="finalCashCount" placeholder="Contagem Final de Dinheiro (R$)" step="0.01">
+        <button id="closeCashBtn">Visualizar Relatório de Fechamento</button>
+        <div id="closingReportSection" style="display:none;">
+          <h4>Relatório de Fechamento (Prévia)</h4>
+          <div id="closingTotals"></div>
+          <p id="cashDifference"></p>
+          <button id="confirmClosingBtn">Confirmar e Salvar</button>
+          <button id="cancelClosingBtn">Cancelar</button>
+          <button id="exportClosingPdfBtn" style="display: none;">Baixar PDF de Fechamento</button>
+        </div>
+      </div>
+      <hr>
+      <h3>Visualizar e Filtrar Movimentações de Caixa</h3>
+      <div class="filters">
+        <label for="filterCashDateStart">De:</label>
+        <input type="date" id="filterCashDateStart">
+        <label for="filterCashDateEnd">Até:</label>
+        <input type="date" id="filterCashDateEnd">
+
+        <label for="filterCashType">Tipo:</label>
+        <select id="filterCashType">
+          <option value="Todos">Todos</option>
+          <option value="sangria">Sangria</option>
+          <option value="suprimento">Suprimento</option>
+        </select>
+        <button id="applyCashFiltersBtn">Aplicar Filtros</button>
+      </div>
+      <div class="total-sales">
+        Total Movimentações (Visível): <span id="totalCashMovValue">R$ 0,00</span>
+      </div>
+      <button id="toggleCashListBtn">Mostrar Movimentações</button>
+      <div id="cashMovList" style="display:none;">
+        <p>Nenhuma movimentação encontrada.</p>
+      </div>
+      <div class="download-buttons">
+        <button id="exportCashMovPdfBtn">Baixar PDF (Movimentações Filtradas)</button>
+      </div>
+      <hr>
+      <h3>Cadastrar/Atualizar Produto</h3>
+      <div>
+        <input type="text" id="newProductBarcode" placeholder="Código de Barras do Produto">
+        <input type="text" id="newProductName" placeholder="Nome do Produto">
+        <input type="number" id="newProductPrice" placeholder="Preço (R$)" step="0.01">
+        <select id="newProductUnit">
+          <option value="unidade">Unidade</option>
+          <option value="kilo">Kilo</option>
+        </select>
+        <input type="number" id="newProductStock" placeholder="Quantidade em Estoque (unidades ou kg)" step="0.001">
+        <button id="addProductBtn">Salvar Produto</button>
+        <small>Use esta seção para adicionar ou atualizar produtos que serão reconhecidos pelo leitor de código de barras.</small>
+      </div>
+      <hr>
+      <h3>Gerenciar Produtos</h3>
+      <div>
+        <button id="toggleProductListBtn">Mostrar Produtos</button>
+        <div id="productList" style="display:none;">
+          <p>Nenhum produto cadastrado.</p>
+        </div>
+      </div>
+      <hr>
+      <h3>Registrar Venda Manual (Alternativa)</h3>
+      <label for="dataVenda">Data e Hora da Venda:</label>
+      <input type="datetime-local" id="dataVenda" required="">
+
+      <input type="number" id="valorTotal" placeholder="Valor Total da Venda (R$)" step="0.01" required="">
+
+      <label for="tipoPagamento">Tipo de Pagamento:</label>
+      <select id="tipoPagamento">
+        <option value="Pix">Pix</option>
+        <option value="Dinheiro">Dinheiro</option>
+        <option value="Credito">Crédito</option>
+        <option value="Debito">Débito</option>
+        <option value="Outro">Outro</option>
+      </select>
+
+      <textarea id="observacoes" placeholder="Observações (opcional)"></textarea>
+
+      <button id="submitSale">Salvar Venda</button>
+      <hr>
+      <h3>Visualizar e Filtrar Vendas</h3>
+      <div class="filters">
+        <label for="filterDateStart">De:</label>
+        <input type="date" id="filterDateStart">
+        <label for="filterDateEnd">Até:</label>
+        <input type="date" id="filterDateEnd">
+
+        <label for="filterPaymentType">Tipo de Pagamento:</label>
+        <select id="filterPaymentType">
+          <option value="Todos">Todos</option>
+          <option value="Pix">Pix</option>
+          <option value="Dinheiro">Dinheiro</option>
+          <option value="Credito">Crédito</option>
+          <option value="Debito">Débito</option>
+          <option value="Outro">Outro</option>
+        </select>
+        <button id="applyFiltersBtn">Aplicar Filtros</button>
+      </div>
+      <div class="period-totals">
+        <div>
+          <strong>Vendas do Dia:</strong>
+          <span id="totalDaySales">R$ 0,00</span>
+        </div>
+        <div>
+          <strong>Vendas da Semana:</strong>
+          <span id="totalWeekSales">R$ 0,00</span>
+        </div>
+        <div>
+          <strong>Vendas do Mês:</strong>
+          <span id="totalMonthSales">R$ 0,00</span>
+        </div>
+      </div>
+      <hr>
+      <h3>Ranking dos Produtos Mais Vendidos</h3>
+      <div id="rankingList">
+        <p>Nenhum dado de vendas para exibir o ranking.</p>
+      </div>
+      <div class="download-buttons">
+        <button id="exportRankingPdfBtn">Baixar Ranking em PDF</button>
+      </div>
+      <hr>
+      <h3>Exportar Vendas e Estoque</h3>
+      <div class="download-buttons">
+        <button id="exportPdfBtn">Baixar PDF (Vendas Filtradas)</button>
+        <button id="exportExcelBtn">Baixar Excel (Vendas Filtradas)</button>
+        <button id="exportStockPdfBtn">Baixar PDF (Estoque Atual)</button>
+      </div>
+      <hr>
+      <h3>Enviar Relatório por Número</h3>
+      <div class="report-section">
+        <input type="text" id="phoneNumber" placeholder="Número de Telefone (Ex: 55 DDD NÚMERO)" title="Formato: Código do país + DDD + Número. Ex: 5511987654321">
+        <button id="sendReportBtn">Enviar Relatório (Filtradas)</button>
+        <small>Para WhatsApp, use o formato completo com código do país (ex: 55 para Brasil).</small>
+      </div>
+      <hr>
+      <h3>Suas Vendas</h3>
+      <div class="total-sales">
+        Total Geral de Vendas (Visível): <span id="totalSalesValue">R$ 0,00</span>
+      </div>
+      <div id="saleList"></div>
+      <!-- Seção Melhorada: Importar XML da Nota Fiscal de Entrada -->
+      <hr>
+      <h3>IMPORTAR XML DA NOTA FISCAL DE ENTRADA</h3>
+      <div class="xml-container">
+        <div class="xml-header">
+          <h2>Importar Nota Fiscal de Entrada</h2>
+        </div>
+
+    <div id="importSection">
+      <div class="xml-file-upload">
+        <input type="file" id="xmlFile" accept=".xml">
+        <button onclick="loadXML()">Carregar XML</button>
+      </div>
+
+      <div class="xml-section-title">Informações Gerais</div>
+      <div class="xml-fields">
+        <div class="xml-field">
+          <label>Filial</label>
+          <input type="text" id="filial" readonly="">
+        </div>
+        <div class="xml-field">
+          <label>Fornecedor</label>
+          <input type="text" id="fornecedor" readonly="">
+        </div>
+        <div class="xml-field">
+          <label>Modelo</label>
+          <input type="text" id="modelo" readonly="">
+        </div>
+        <div class="xml-field">
+          <label>Série</label>
+          <input type="text" id="serie" readonly="">
+        </div>
+        <div class="xml-field">
+          <label>Número</label>
+          <input type="text" id="numero" readonly="">
+        </div>
+        <div class="xml-field">
+          <label>Data Entrada</label>
+          <input type="text" id="dataEntrada" readonly="">
+        </div>
+        <div class="xml-field">
+          <label>Data Emissão</label>
+          <input type="text" id="dataEmissao" readonly="">
+        </div>
+      </div>
+
+      <div class="xml-section-title">Produtos</div>
+      <table id="produtosTable" class="xml-table">
+        <thead>
+          <tr>
+            <th>Ordem</th>
+            <th>ID</th>
+            <th>Código</th>
+            <th>Produto</th>
+            <th>Qtd. entra</th>
+            <th>Unid.</th>
+            <th>Preço</th>
+            <th>Subtotal</th>
+            <th>Desconto</th>
+            <th>Total</th>
+            <th>CFOP</th>
+            <th>Custo total</th>
+            <th>Markup calculado</th>
+            <th>Preço venda</th>
+            <th>NCM</th>
+            <th>CS</th>
+            <th>Mapear para</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <div class="xml-section-title">Totais / Impostos</div>
+      <div class="xml-totals">
+        <div class="xml-field">
+          <label>Base de Cálculo do ICMS</label>
+          <input type="text" id="baseICMS" readonly="">
+        </div>
+        <div class="xml-field">
+          <label>Valor do ICMS</label>
+          <input type="text" id="valorICMS" readonly="">
+        </div>
+        <div class="xml-field">
+          <label>Base de Cálculo ICMS Sub.</label>
+          <input type="text" id="baseICMSSub" readonly="">
+        </div>
+        <div class="xml-field">
+          <label>Valor ICMS Substituição</label>
+          <input type="text" id="valorICMSSub" readonly="">
+        </div>
+        <div class="xml-field">
+          <label>Valor Total dos Produtos</label>
+          <input type="text" id="totalProdutos" readonly="">
+        </div>
+        <div class="xml-field">
+          <label>Total da Nota</label>
+          <input type="text" id="totalNota" readonly="">
+        </div>
+        <div class="xml-field">
+          <label>Valor do Frete</label>
+          <input type="text" id="valorFrete" readonly="">
+        </div>
+        <div class="xml-field">
+          <label>Valor do Seguro</label>
+          <input type="text" id="valorSeguro" readonly="">
+        </div>
+        <div class="xml-field">
+          <label>Desconto</label>
+          <input type="text" id="desconto" readonly="">
+        </div>
+        <div class="xml-field">
+          <label>Outras Despesas</label>
+          <input type="text" id="outrasDespesas" readonly="">
+        </div>
+        <div class="xml-field">
+          <label>Valor IPI</label>
+          <input type="text" id="valorIPI" readonly="">
+        </div>
+      </div>
+
+      <div class="xml-section-title">Duplicatas / Contas a Pagar</div>
+      <table id="duplicatasTable" class="xml-table">
+        <thead>
+          <tr>
+            <th>Número</th>
+            <th>Data Vencimento</th>
+            <th>Valor</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <button onclick="addDuplicataRow()">Adicionar Duplicata</button>
+      <p>Valor Restante: <span id="remaining">0.00</span></p>
+
+      <div class="xml-buttons">
+        <button onclick="confirmarNota()">Confirmar</button>
+        <button onclick="cancelarNota()">Cancelar</button>
+      </div>
+    </div>
+    <div id="statusSection" style="display: none;">
+      <div class="status" id="notaStatus">Status: Aguardando Processamento</div>
+      <div class="action-buttons">
+        <button onclick="gerarOutraNota()">Gerar Outra Nota</button>
+        <button onclick="verContasAPagar()">Ver Contas a Pagar</button>
+      </div>
+      <div class="processed-notes">
+        <h3>Notas Lançadas</h3>
+        <div id="notesList"></div>
+      </div>
+      <div class="accounts-payable" id="apSection" style="display: none;">
+        <h3>Contas a Pagar Geradas</h3>
+        <table id="apTable">
+          <thead>
+            <tr>
+              <th onclick="sortTable(0)">Empresa</th>
+              <th onclick="sortTable(1)">Valor</th>
+              <th onclick="sortTable(2)">Data Vencimento</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div id="noteDetails">
+        <h3>Detalhes da Nota</h3>
+        <div id="noteInfo"></div>
+        <h4>Produtos</h4>
+        <table id="noteProductsTable">
+          <thead>
+            <tr>
+              <th>Ordem</th>
+              <th>ID</th>
+              <th>Código</th>
+              <th>Produto</th>
+              <th>Qtd. entra</th>
+              <th>Unid.</th>
+              <th>Preço</th>
+              <th>Subtotal</th>
+              <th>Desconto</th>
+              <th>Total</th>
+              <th>CFOP</th>
+              <th>Custo total</th>
+              <th>Markup calculado</th>
+              <th>Preço venda</th>
+              <th>NCM</th>
+              <th>CS</th>
+              <th>Mapear para</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <button onclick="printToPDF()">Imprimir em PDF</button>
+        <button onclick="closeNoteDetails()">Fechar</button>
+      </div>
+    </div>
+  </div>
+  <!-- Nova seção: Visualizar Contas a Pagar com Filtro -->
+  <hr>
+  <h3>Visualizar e Filtrar Contas a Pagar</h3>
+  <div class="filters">
+    <label for="filterApDateStart">De:</label>
+    <input type="date" id="filterApDateStart">
+    <label for="filterApDateEnd">Até:</label>
+    <input type="date" id="filterApDateEnd">
+
+    <label for="filterApFornecedor">Fornecedor:</label>
+    <input type="text" id="filterApFornecedor" placeholder="Nome do Fornecedor">
+    <label for="filterApStatus">Status:</label>
+    <select id="filterApStatus">
+      <option value="Todos">Todos</option>
+      <option value="Pendente">Pendente</option>
+      <option value="Pago">Pago</option>
+    </select>
+    <button id="applyApFiltersBtn">Aplicar Filtros</button>
+  </div>
+  <div class="total-sales">
+    Total Geral de Contas a Pagar (Visível): <span id="totalApValue">R$ 0,00</span>
+  </div>
+  <button id="toggleApListBtn">Mostrar Contas a Pagar</button>
+  <div id="apList" style="display:none;">
+    <p>Nenhuma conta a pagar encontrada.</p>
+  </div>
+  <div class="download-buttons">
+    <button id="exportApPdfBtn">Baixar PDF (Contas Filtradas)</button>
+  </div>
+  <hr>
+  <h3>Adicionar Conta a Pagar Manual</h3>
+  <div id="addApForm">
+    <input type="text" id="newApFornecedor" placeholder="Nome do Fornecedor">
+    <input type="number" id="newApValor" placeholder="Valor (R$)" step="0.01">
+    <input type="date" id="newApDataVenc">
+    <button id="addApBtn">Adicionar Conta</button>
+  </div>
+  <!-- Seção: Inventário de Estoque -->
+  <hr>
+  <h3>INVENTÁRIO DE ESTOQUE</h3>
+  <div class="inventory-container">
+    <div class="inventory-header">
+      <h2>Gerenciar Inventário</h2>
     </div>
 
-    <button onclick="enterSite()" class="enter-btn">Entrar</button>
+    <div id="inventoryForm">
+      <button onclick="iniciarInventario()">Iniciar Novo Inventário</button>
+      <table id="inventoryProductsTable" class="xml-table" style="display: none;">
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Nome</th>
+            <th>Unidade</th>
+            <th>Estoque Atual</th>
+            <th>Quantidade Contada</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div class="xml-buttons" id="inventoryButtons" style="display: none;">
+        <button onclick="confirmarInventario()">Processar Inventário</button>
+        <button onclick="cancelarInventario()">Cancelar</button>
+      </div>
+    </div>
+    <div id="inventoryStatusSection" style="display: none;">
+      <div class="status" id="invStatus">Status: Aguardando Processamento</div>
+      <div class="action-buttons">
+        <button onclick="gerarOutroInventario()">Gerar Outro Inventário</button>
+      </div>
+      <div class="processed-notes">
+        <h3>Inventários Lançados</h3>
+        <div id="inventoriesList"></div>
+      </div>
+      <div id="inventoryDetails">
+        <h3>Detalhes do Inventário</h3>
+        <div id="inventoryInfo"></div>
+        <h4>Produtos</h4>
+        <table id="inventoryProductsDetailTable">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Nome</th>
+              <th>Unidade</th>
+              <th>Estoque Antigo</th>
+              <th>Quantidade Contada</th>
+              <th>Diferença</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <button onclick="closeInventoryDetails()">Fechar</button>
+      </div>
+    </div>
   </div>
+  <hr>
+  <h3>Cadastrar/Atualizar Cliente</h3>
+  <div id="customerForm">
+    <input type="text" id="customerId" placeholder="ID do Cliente (deixe vazio para novo)" hidden="">
+    <input type="text" id="customerNome" placeholder="Nome Completo">
+    <input type="date" id="customerDataNasc" placeholder="Data de Nascimento">
+    <input type="text" id="customerCpfRg" placeholder="CPF ou RG">
+    <input type="text" id="customerTelefone" placeholder="Número de Telefone (ex: 5511987654321)">
+    <button id="addCustomerBtn">Salvar Cliente</button>
+  </div>
+  <hr>
+  <h3>Gerenciar Clientes</h3>
+  <div>
+    <button id="toggleCustomerListBtn">Mostrar Clientes</button>
+    <div id="customerList" style="display:none;">
+      <p>Nenhum cliente cadastrado.</p>
+    </div>
+  </div>
+  <hr>
+  <h3>Contas a Receber</h3>
+  <div class="filters">
+    <label for="filterArDateStart">De:</label>
+    <input type="date" id="filterArDateStart">
+    <label for="filterArDateEnd">Até:</label>
+    <input type="date" id="filterArDateEnd">
 
-  <!-- Conteúdo Principal -->
-  <main id="main-content" class="page" style="display: none;">
-    <h1>NTE VÍDEOS </h1>
-    <nav class="subject-buttons">
-      <button onclick="goHome()">Início</button>
-      <button onclick="openCategory('Matemática')">Matemática</button>
-      <button onclick="openCategory('Física')">Física</button>
-      <button onclick="openCategory('Português')">Português</button>
-      <button onclick="openCategory('Inglês')">Inglês</button>
-      <button onclick="openCategory('História')">História</button>
-    </nav>
+    <label for="filterArCliente">Cliente:</label>
+    <input type="text" id="filterArCliente" placeholder="Nome do Cliente">
+    <label for="filterArStatus">Status:</label>
+    <select id="filterArStatus">
+      <option value="Todos">Todos</option>
+      <option value="Pendente">Pendente</option>
+      <option value="Pago">Pago</option>
+    </select>
+    <button id="applyArFiltersBtn">Aplicar Filtros</button>
+  </div>
+  <div class="total-sales">
+    Total Geral de Contas a Receber (Visível): <span id="totalArValue">R$ 0,00</span>
+  </div>
+  <button id="toggleArListBtn">Mostrar Contas a Receber</button>
+  <div id="arList" style="display:none;">
+    <p>Nenhuma conta a receber encontrada.</p>
+  </div>
+  <div class="download-buttons">
+    <button id="exportArPdfBtn">Baixar PDF (Contas Filtradas)</button>
+  </div>
+  <hr>
+  <h3>Adicionar Conta a Receber Manual</h3>
+  <div id="addArForm">
+    <input type="text" id="newArCliente" placeholder="Nome do Cliente">
+    <input type="number" id="newArValor" placeholder="Valor (R$)" step="0.01">
+    <input type="date" id="newArDataVenc">
+    <button id="addArBtn">Adicionar Conta</button>
+  </div>
+  <hr>
+  <h3>Cadastrar/Atualizar Fornecedor</h3>
+  <div id="supplierForm">
+    <input type="text" id="supplierId" placeholder="ID do Fornecedor (deixe vazio para novo)" hidden="">
+    <input type="text" id="supplierNome" placeholder="Nome do Fornecedor">
+    <input type="text" id="supplierCnpj" placeholder="CNPJ">
+    <input type="text" id="supplierTelefone" placeholder="Telefone">
+    <button id="addSupplierBtn">Salvar Fornecedor</button>
+  </div>
+  <hr>
+  <h3>Gerenciar Fornecedores</h3>
+  <div>
+    <button id="toggleSupplierListBtn">Mostrar Fornecedores</button>
+    <div id="supplierList" style="display:none;">
+      <p>Nenhum fornecedor cadastrado.</p>
+    </div>
+  </div>
+</div>
+<script type="module">
+  import {
+    initializeApp
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    onAuthStateChanged,
+    signOut
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import {
+    getDatabase,
+    ref,
+    push,
+    set,
+    update,
+    onValue,
+    remove,
+    runTransaction
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+  const firebaseConfig = {
+    apiKey: "AIzaSyDJBdK9I-jtg9ujTc9Xsxr-hnPfkId4wIU",
+    authDomain: "pdv1-77632.firebaseapp.com",
+    databaseURL: "https://pdv1-77632-default-rtdb.firebaseio.com",
+    projectId: "pdv1-77632",
+    storageBucket: "pdv1-77632.firebasestorage.app",
+    messagingSenderId: "246033791117",
+    appId: "1:246033791117:web:7b70b511ea8d8c5ba1cac4",
+    measurementId: "G-NTG13SG6VM"
+  };
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth();
+  const db = getDatabase();
+  let allSalesData = [];
+  let filteredSalesData = [];
+  let activeSaleItems = [];
+  let productsDatabase = {};
+  let tempWeight = null; // Variável para armazenar a gramatura temporariamente
+  let adjustmentValue = 0; // Valor de ajuste (desconto ou acréscimo)
+  let cashOpened = false;
+  let initialCash = 0;
+  let openerName = '';
+  let closerName = '';
+  let openingTimestamp = '';
+  let closingTimestamp = '';
+  let cashOperations = [];
+  let dailySalesByPayment = {
+    Pix: 0,
+    Dinheiro: 0,
+    Credito: 0,
+    Debito: 0,
+    Outro: 0
+  };
+  let allCashData = [];
+  let filteredCashOperations = [];
+  let finalCash = 0;
+  let difference = 0;
+  // Garantir foco no campo barcodeInput ao carregar a página
+  document.getElementById("barcodeInput").focus();
+  // Função para atualizar o campo dataVenda com o horário atual
+  function updateDataVenda() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    document.getElementById("dataVenda").value = `${year}-${month}-${day}T${hours}:${minutes}`;
+  }
+  // --- Funções de Autenticação ---
+  document.getElementById("registerBtn").onclick = () => {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    createUserWithEmailAndPassword(auth, email, password)
+      .then(() => alert("Usuário registrado!"))
+      .catch(err => alert(err.message));
+  };
+  document.getElementById("loginBtn").onclick = () => {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        const user = userCredential.user;
+        alert("Login realizado!");
+        loadProductsFromDatabase(user.uid);
+      })
+      .catch(err => alert(err.message));
+  };
+  document.getElementById("logoutBtn").onclick = () => {
+    signOut(auth);
+  };
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      document.getElementById("authSection").style.display = "none";
+      document.getElementById("saleSection").style.display = "block";
+      loadAllSalesAndFilter(user.uid);
+      updateDataVenda();
+      const today = new Date();
+      const todayFormatted = today.toISOString().split('T')[0];
+      document.getElementById("filterDateStart").value = todayFormatted;
+      document.getElementById("filterDateEnd").value = todayFormatted;
+      cancelActiveSale();
+      loadProductsFromDatabase(user.uid);
+      loadNotasEntradas(user.uid);
+      loadAllApAndFilter(user.uid);
+      loadInventories(user.uid);
+      loadCashData(user.uid);
+      loadAllCashAndFilter(user.uid);
+      loadCustomersFromDatabase(user.uid);
+      loadAllArAndFilter(user.uid);
+      loadSuppliersFromDatabase(user.uid);
+    } else {
+      document.getElementById("authSection").style.display = "block";
+      document.getElementById("saleSection").style.display = "none";
+    }
+  });
+  // --- Função para carregar produtos do Firebase ---
+  function loadProductsFromDatabase(uid) {
+    const produtosRef = ref(db, `produtos/${uid}`);
+    onValue(produtosRef, snapshot => {
+      productsDatabase = {};
+      if (snapshot.exists()) {
+        productsDatabase = snapshot.val();
+        console.log("Produtos carregados:", productsDatabase); // Log para depuração
+      } else {
+        console.log("Nenhum produto encontrado no Firebase.");
+      }
+      displayProducts();
+      updateRankingDisplay(); // Atualiza o ranking ao carregar produtos
+    }, {
+      onlyOnce: false
+    });
+  }
+  // --- Função para adicionar/atualizar produtos ---
+  document.getElementById("addProductBtn").onclick = () => {
+    const barcode = document.getElementById("newProductBarcode").value.trim();
+    const name = document.getElementById("newProductName").value.trim();
+    const price = parseFloat(document.getElementById("newProductPrice").value);
+    const unit = document.getElementById("newProductUnit").value;
+    const stock = parseFloat(document.getElementById("newProductStock").value) || 0;
+    if (!barcode || !name || isNaN(price) || price <= 0) {
+      alert("Por favor, preencha todos os campos do produto corretamente (Código, Nome e Preço).");
+      return;
+    }
+    if (stock < 0) {
+      alert("A quantidade em estoque não pode ser negativa.");
+      return;
+    }
+    const user = auth.currentUser;
+    if (user) {
+      const productRef = ref(db, `produtos/${user.uid}/${barcode}`);
+      onValue(productRef, snapshot => {
+        if (snapshot.exists() && !confirm(`O produto com código ${barcode} já existe. Deseja atualizá-lo?`)) {
+          return;
+        }
+        const productData = {
+          nome: name,
+          preco: price,
+          unidade: unit,
+          estoque: stock
+        };
+        set(productRef, productData)
+          .then(() => {
+            alert("Produto salvo com sucesso!");
+            resetProductForm();
+          })
+          .catch(err => alert("Erro ao salvar produto: " + err.message));
+      }, {
+        onlyOnce: true
+      });
+    } else {
+      alert("Você precisa estar logado para adicionar produtos.");
+    }
+  };
+  // --- Função para exibir produtos na interface ---
+  function displayProducts() {
+    const productListDiv = document.getElementById("productList");
+    productListDiv.innerHTML = "";
+    if (Object.keys(productsDatabase).length === 0) {
+      productListDiv.innerHTML = "<p>Nenhum produto cadastrado.</p>";
+      return;
+    }
+    const table = document.createElement("table");
+    table.style.width = "100%";
+    table.style.borderCollapse = "collapse";
+    table.innerHTML = `
+    <thead>
+      <tr style="background-color: #007bff; color: white;">
+        <th style="padding: 10px; border: 1px solid #ddd;">Código de Barras</th>
+        <th style="padding: 10px; border: 1px solid #ddd;">Nome</th>
+        <th style="padding: 10px; border: 1px solid #ddd;">Preço (R$)</th>
+        <th style="padding: 10px; border: 1px solid #ddd;">Unidade</th>
+        <th style="padding: 10px; border: 1px solid #ddd;">Estoque</th>
+        <th style="padding: 10px; border: 1px solid #ddd;">Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${Object.entries(productsDatabase).map(([barcode, product]) => `
+        <tr class="${(product.estoque || 0) < (product.unidade === 'kilo' ? 0.1 : 1) ? 'low-stock' : ''}">
+          <td style="padding: 10px; border: 1px solid #ddd;">${barcode}</td>
+          <td style="padding: 10px; border: 1px solid #ddd;">${product.nome}</td>
+          <td style="padding: 10px; border: 1px solid #ddd;">${product.preco.toFixed(2).replace('.', ',')}</td>
+          <td style="padding: 10px; border: 1px solid #ddd;">${product.unidade === 'kilo' ? 'Kilo' : 'Unidade'}</td>
+          <td style="padding: 10px; border: 1px solid #ddd;">${(product.estoque || 0).toFixed(3).replace('.', ',')} ${product.unidade === 'kilo' ? 'kg' : 'un'}</td>
+          <td style="padding: 10px; border: 1px solid #ddd;">
+            <button onclick="editProduct('${barcode}')">Editar</button>
+            <button onclick="deleteProduct('${barcode}')">Excluir</button>
+          </td>
+        </tr>
+      `).join('')}
+    </tbody>
+  `;
+    productListDiv.appendChild(table);
+  }
+  // --- Função para editar produto ---
+  window.editProduct = (barcode) => {
+    const product = productsDatabase[barcode];
+    if (product) {
+      document.getElementById("newProductBarcode").value = barcode;
+      document.getElementById("newProductName").value = product.nome;
+      document.getElementById("newProductPrice").value = product.preco;
+      document.getElementById("newProductUnit").value = product.unidade || "unidade";
+      document.getElementById("newProductStock").value = product.estoque || 0;
+      document.getElementById("newProductBarcode").disabled = true;
+      document.getElementById("addProductBtn").textContent = "Atualizar Produto";
+    }
+  };
+  // --- Função para excluir produto ---
+  window.deleteProduct = (barcode) => {
+    const confirmacao = confirm(`Tem certeza que deseja excluir o produto com código ${barcode}?`);
+    if (!confirmacao) return;
+    const user = auth.currentUser;
+    if (user) {
+      const productRef = ref(db, `produtos/${user.uid}/${barcode}`);
+      remove(productRef)
+        .then(() => {
+          alert("Produto excluído com sucesso!");
+        })
+        .catch(err => alert("Erro ao excluir produto: " + err.message));
+    }
+  };
+  // --- Função para resetar o formulário de produtos ---
+  function resetProductForm() {
+    document.getElementById("newProductBarcode").value = "";
+    document.getElementById("newProductName").value = "";
+    document.getElementById("newProductPrice").value = "";
+    document.getElementById("newProductUnit").value = "unidade";
+    document.getElementById("newProductStock").value = "";
+    document.getElementById("newProductBarcode").disabled = false;
+    document.getElementById("addProductBtn").textContent = "Salvar Produto";
+  }
+  // --- Função para alternar visibilidade da lista de produtos (ATUALIZADA) ---
+  document.getElementById("toggleProductListBtn").onclick = () => {
+    const productListDiv = document.getElementById("productList");
+    const toggleBtn = document.getElementById("toggleProductListBtn");
+    if (productListDiv.style.display === "none") {
+      productListDiv.style.display = "block";
+      toggleBtn.textContent = "Ocultar Produtos";
+      // Força recarregamento se vazio
+      if (productListDiv.innerHTML.includes("Nenhum produto")) {
+        const user = auth.currentUser;
+        if (user) {
+          loadProductsFromDatabase(user.uid);
+        } else {
+          alert("Faça login para carregar os produtos.");
+        }
+      }
+    } else {
+      productListDiv.style.display = "none";
+      toggleBtn.textContent = "Mostrar Produtos";
+    }
+  };
+  // --- Funções da Venda Ativa ---
+  document.getElementById("barcodeInput").addEventListener("keypress", function(event) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      const input = this.value.trim();
+      console.log("Entrada recebida:", input); // Log para depuração
+      if (input) {
+        if (input.endsWith('*') && !tempWeight) {
+          // Entrada de gramatura (ex.: "150 *")
+          const weightInput = input.slice(0, -1).trim();
+          const weight = parseFloat(weightInput);
+          console.log("Gramatura digitada:", weightInput, "Convertida (kg):", weight / 1000); // Log
+          if (isNaN(weight) || weight <= 0) {
+            alert("Por favor, insira uma gramatura válida (ex.: 150 *).");
+            return;
+          }
+          tempWeight = weight / 1000; // Converte gramas para kg
+          alert(`Gramatura de ${weight}g registrada. Digite o código do produto.`); // Feedback visual
+          this.value = "";
+          console.log("Campo limpo"); // Log
+          this.placeholder = "Digite o código do produto";
+          console.log("tempWeight definido:", tempWeight); // Log
+          // Timeout para resetar tempWeight após 30 segundos
+          setTimeout(() => {
+            if (tempWeight) {
+              tempWeight = null;
+              this.placeholder = "Ex: 150 * para gramatura ou código do produto";
+              alert("Tempo esgotado. Por favor, insira a gramatura novamente.");
+              console.log("tempWeight resetado por timeout"); // Log
+            }
+          }, 30000);
+        } else {
+          // Entrada de código de barras
+          console.log("Processando código de barras:", input, "tempWeight atual:", tempWeight); // Log
+          addItemToActiveSale(input);
+          this.value = "";
+          console.log("Campo limpo após código"); // Log
+          this.placeholder = "Ex: 150 * para gramatura ou código do produto";
+        }
+        this.focus(); // Garante foco após cada entrada
+      }
+    }
+  });
 
-    <!-- Categorias -->
-    <section class="category" id="matemática-section">
-      <h2>Matemática</h2>
-      <div class="video-list" id="matemática-videos"></div>
-    </section>
+  function addItemToActiveSale(barcode) {
+    console.log("addItemToActiveSale chamado com barcode:", barcode); // Log
+    let product;
+    let quantidade = 1;
+    let preco;
+    if (tempWeight) {
+      // Modo gramatura manual
+      console.log("Modo gramatura manual, tempWeight:", tempWeight); // Log
+      product = productsDatabase[barcode];
+      console.log("Produto encontrado:", product); // Log
+      if (!product) {
+        alert(`Produto com código ${barcode} não encontrado. Por favor, cadastre-o.`);
+        tempWeight = null;
+        document.getElementById("barcodeInput").placeholder = "Ex: 150 * para gramatura ou código do produto";
+        document.getElementById("barcodeInput").focus();
+        return;
+      }
+      if (product.unidade !== 'kilo') {
+        alert(`Produto ${product.nome} não é do tipo 'kilo'. Use código de barras para produtos por unidade.`);
+        tempWeight = null;
+        document.getElementById("barcodeInput").placeholder = "Ex: 150 * para gramatura ou código do produto";
+        document.getElementById("barcodeInput").focus();
+        return;
+      }
+      quantidade = tempWeight;
+      preco = product.preco * quantidade;
+      console.log("Calculado: quantidade =", quantidade, "preco =", preco); // Log
+      tempWeight = null; // Reseta após uso
+    } else if (barcode.startsWith('2') && barcode.length === 13) {
+      // Código de barras com peso embutido
+      const productCode = barcode.slice(1, 7);
+      const priceCents = parseInt(barcode.slice(7, 12));
+      product = productsDatabase[productCode];
+      console.log("Código com peso, productCode:", productCode, "priceCents:", priceCents, "Produto:", product); // Log
+      if (product && product.unidade === 'kilo') {
+        preco = priceCents / 100;
+        quantidade = preco / product.preco;
+        if (isNaN(quantidade) || quantidade <= 0) {
+          alert("Erro ao calcular o peso do produto. Verifique o preço por kg.");
+          document.getElementById("barcodeInput").focus();
+          return;
+        }
+      } else {
+        alert(`Produto com código ${productCode} não encontrado ou não é do tipo 'kilo'.`);
+        document.getElementById("barcodeInput").focus();
+        return;
+      }
+    } else {
+      // Produto por unidade
+      product = productsDatabase[barcode];
+      console.log("Produto por unidade, barcode:", barcode, "Produto:", product); // Log
+      if (!product) {
+        alert(`Produto com código ${barcode} não encontrado. Por favor, cadastre-o.`);
+        document.getElementById("barcodeInput").focus();
+        return;
+      }
+      if (product.unidade === 'kilo') {
+        alert(`Produto ${product.nome} é do tipo 'kilo'. Use um código iniciando em '2' ou insira a gramatura manualmente (ex.: 150 *).`);
+        document.getElementById("barcodeInput").focus();
+        return;
+      }
+      preco = product.preco;
+      quantidade = 1;
+    }
+    activeSaleItems.push({
+      numero: activeSaleItems.length + 1,
+      codigo: barcode,
+      nome: product.nome,
+      preco: preco,
+      quantidade: quantidade,
+      unidade: product.unidade
+    });
+    console.log("Item adicionado à venda:", activeSaleItems[activeSaleItems.length - 1]); // Log
+    updateActiveSaleDisplay();
+    document.getElementById("barcodeInput").focus(); // Garante foco após adicionar item
+  }
+  window.removeItemFromActiveSale = (itemNumber) => {
+    const initialLength = activeSaleItems.length;
+    activeSaleItems = activeSaleItems.filter(item => item.numero !== itemNumber);
+    if (activeSaleItems.length < initialLength) {
+      activeSaleItems.forEach((item, index) => {
+        item.numero = index + 1;
+      });
+      updateActiveSaleDisplay();
+    } else {
+      alert("Item não encontrado para remoção.");
+    }
+    document.getElementById("barcodeInput").focus();
+  };
 
-    <section class="category" id="física-section">
-      <h2>Física</h2>
-      <div class="video-list" id="física-videos"></div>
-    </section>
+  function updateActiveSaleDisplay() {
+    const itemListDiv = document.getElementById("activeSaleItems");
+    itemListDiv.innerHTML = "";
+    let subtotal = 0;
+    if (activeSaleItems.length === 0) {
+      itemListDiv.innerHTML = "<p>Nenhum item adicionado ainda.</p>";
+    } else {
+      activeSaleItems.forEach(item => {
+        const itemDiv = document.createElement("div");
+        itemDiv.classList.add("sale-item");
+        const quantidadeDisplay = item.unidade === 'kilo' ?
+          `${(item.quantidade * 1000).toFixed(0)}g` :
+          `${item.quantidade} un`;
+        itemDiv.innerHTML = `
+        <span>${item.numero}. ${item.nome} (${quantidadeDisplay}) - R$ ${item.preco.toFixed(2).replace('.', ',')}</span>
+        <button onclick="removeItemFromActiveSale(${item.numero})" class="remove-item-btn">Remover</button>
+      `;
+        itemListDiv.appendChild(itemDiv);
+        subtotal += item.preco;
+      });
+    }
+    const total = subtotal + adjustmentValue;
+    document.getElementById("currentSaleTotal").textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+    document.getElementById("adjustmentDisplay").textContent = `Ajuste aplicado: R$ ${adjustmentValue.toFixed(2).replace('.', ',')}`;
+    document.getElementById("finalizarVendaBtn").disabled = activeSaleItems.length === 0;
+  }
+  // Aplicar desconto/acréscimo
+  document.getElementById("applyAdjustmentBtn").onclick = () => {
+    const amount = parseFloat(document.getElementById("adjustmentAmount").value) || 0;
+    const type = document.getElementById("adjustmentType").value;
+    const subtotal = activeSaleItems.reduce((sum, item) => sum + item.preco, 0);
+    let adjustment = 0;
+    if (type === "desconto") {
+      adjustment = -amount;
+    } else if (type === "descontoPercent") {
+      adjustment = -(subtotal * (amount / 100));
+    } else if (type === "acrescimo") {
+      adjustment = amount;
+    } else if (type === "acrescimoPercent") {
+      adjustment = subtotal * (amount / 100);
+    }
+    adjustmentValue = adjustment;
+    updateActiveSaleDisplay();
+  };
+  document.getElementById("finalizarVendaBtn").onclick = () => {
+    if (activeSaleItems.length === 0) {
+      alert("Adicione itens à venda antes de finalizar.");
+      return;
+    }
+    updateDataVenda();
+    const subtotal = activeSaleItems.reduce((sum, item) => sum + item.preco, 0);
+    const total = subtotal + adjustmentValue;
+    document.getElementById("modalTotalValue").textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+    document.getElementById("paymentModal").style.display = "block";
+    document.getElementById("amountGivenContainer").style.display = "none";
+    document.getElementById("changeDue").textContent = "R$ 0,00";
+    document.getElementById("amountGiven").value = "";
+    document.getElementById("modalPaymentType").value = "Pix";
+  };
+  document.querySelector(".close-button").onclick = () => {
+    document.getElementById("paymentModal").style.display = "none";
+    tempWeight = null;
+    document.getElementById("barcodeInput").placeholder = "Ex: 150 * para gramatura ou código do produto";
+    document.getElementById("barcodeInput").focus();
+  };
+  document.getElementById("modalPaymentType").onchange = function() {
+    if (this.value === "Dinheiro") {
+      document.getElementById("amountGivenContainer").style.display = "block";
+      document.getElementById("amountGiven").focus();
+    } else {
+      document.getElementById("amountGivenContainer").style.display = "none";
+      document.getElementById("changeDue").textContent = "R$ 0,00";
+      document.getElementById("amountGiven").value = "";
+    }
+  };
+  document.getElementById("amountGiven").oninput = function() {
+    const subtotal = activeSaleItems.reduce((sum, item) => sum + item.preco, 0);
+    const total = subtotal + adjustmentValue;
+    const amountGiven = parseFloat(this.value) || 0;
+    const change = amountGiven - total;
+    document.getElementById("changeDue").textContent = `R$ ${change.toFixed(2).replace('.', ',')}`;
+    document.getElementById("confirmPaymentBtn").disabled = amountGiven < total && document.getElementById("modalPaymentType").value === "Dinheiro";
+  };
+  document.getElementById("confirmPaymentBtn").onclick = () => {
+    const subtotal = activeSaleItems.reduce((sum, item) => sum + item.preco, 0);
+    const total = subtotal + adjustmentValue;
+    const paymentType = document.getElementById("modalPaymentType").value;
+    const amountGiven = parseFloat(document.getElementById("amountGiven").value) || 0;
+    const dataVenda = document.getElementById("dataVenda").value;
+    if (paymentType === "Dinheiro" && amountGiven < total) {
+      alert("O valor dado pelo cliente é menor que o total da venda.");
+      return;
+    }
+    if (!dataVenda) {
+      alert("Por favor, preencha a data e hora da venda no campo 'Data e Hora da Venda'.");
+      return;
+    }
+    const user = auth.currentUser;
+    if (user) {
+      // Atualizar estoque para cada item vendido
+      const updates = {};
+      activeSaleItems.forEach(item => {
+        const productCode = item.codigo.startsWith('2') && item.codigo.length === 13 ? item.codigo.slice(1, 7) : item.codigo;
+        const productRef = `produtos/${user.uid}/${productCode}`;
+        const currentStock = productsDatabase[productCode]?.estoque || 0;
+        const newStock = currentStock - item.quantidade;
+        updates[productRef + '/estoque'] = newStock; // Permite estoque negativo
+      });
+      // Obter e incrementar o contador de vendas
+      const counterRef = ref(db, `counters/${user.uid}/saleNumber`);
+      runTransaction(counterRef, (current) => {
+        return (current || 0) + 1;
+      }).then((transaction) => {
+        const saleNumber = transaction.snapshot.val();
+        // Salvar a venda com o número
+        const saleData = {
+          saleNumber: saleNumber,
+          dataVenda: dataVenda,
+          valorTotal: total,
+          tipoPagamento: paymentType,
+          items: activeSaleItems.map(item => ({
+            codigo: item.codigo,
+            nome: item.nome,
+            preco: item.preco,
+            quantidade: item.quantidade,
+            unidade: item.unidade
+          })),
+          observacoes: "Venda PDV",
+          adjustment: adjustmentValue
+        };
+        const baseRef = ref(db, `vendas/${user.uid}`);
+        const newSaleRef = push(baseRef);
+        Promise.all([
+            set(newSaleRef, saleData),
+            update(ref(db), updates)
+          ])
+          .then(() => {
+            alert("Venda registrada e estoque atualizado com sucesso!");
+            printSaleReceipt(saleData, amountGiven);
+            updateDailySalesByPayment(paymentType, total);
+            cancelActiveSale();
+            document.getElementById("paymentModal").style.display = "none";
+            loadAllSalesAndFilter(user.uid);
+            loadProductsFromDatabase(user.uid); // Recarrega produtos para atualizar a interface
+          })
+          .catch(err => alert("Erro ao registrar venda ou atualizar estoque: " + err.message));
+      }).catch(err => alert("Erro ao gerar número da venda: " + err.message));
+    } else {
+      alert("Você precisa estar logado para registrar vendas.");
+    }
+  };
+  document.getElementById("cancelSaleBtn").onclick = () => {
+    const confirmCancel = confirm("Tem certeza que deseja cancelar a venda atual?");
+    if (confirmCancel) {
+      cancelActiveSale();
+      alert("Venda cancelada.");
+    }
+  };
 
-    <section class="category" id="português-section">
-      <h2>Português</h2>
-      <div class="video-list" id="português-videos"></div>
-    </section>
+  function cancelActiveSale() {
+    activeSaleItems = [];
+    tempWeight = null;
+    adjustmentValue = 0;
+    updateActiveSaleDisplay();
+    document.getElementById("barcodeInput").value = "";
+    document.getElementById("barcodeInput").placeholder = "Ex: 150 * para gramatura ou código do produto";
+    document.getElementById("barcodeInput").focus();
+    document.getElementById("adjustmentAmount").value = "";
+  }
 
-    <section class="category" id="inglês-section">
-      <h2>Inglês</h2>
-      <div class="video-list" id="inglês-videos"></div>
-    </section>
+  function printSaleReceipt(sale, amountGiven) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const shopName = "VIDA SAUDAVEL";
+    const dateTime = new Date(sale.dataVenda).toLocaleString('pt-BR');
+    let yPos = 10;
+    const margin = 10;
+    const lineHeight = 7;
+    doc.setFontSize(14);
+    doc.text(shopName, doc.internal.pageSize.getWidth() / 2, yPos, { align: 'center' });
+    yPos += lineHeight;
+    doc.setFontSize(10);
+    doc.text(`Venda Nº: ${sale.saleNumber || 'N/A'}`, margin, yPos);
+    yPos += lineHeight;
+    doc.text(`Data: ${dateTime}`, margin, yPos);
+    yPos += lineHeight;
+    doc.text("-----------------------------------------", margin, yPos);
+    yPos += lineHeight;
+    doc.text("ITENS DA VENDA:", margin, yPos);
+    yPos += lineHeight;
+    sale.items.forEach(item => {
+      const quantidadeDisplay = item.unidade === 'kilo' ?
+        `${(item.quantidade * 1000).toFixed(0)}g` :
+        `${item.quantidade} un`;
+      doc.text(`${item.numero}. ${item.nome} (${quantidadeDisplay})`, margin, yPos);
+      doc.text(`R$ ${item.preco.toFixed(2).replace('.', ',')}`, doc.internal.pageSize.getWidth() - margin, yPos, { align: 'right' });
+      yPos += lineHeight;
+    });
+    doc.text("-----------------------------------------", margin, yPos);
+    yPos += lineHeight;
+    doc.setFontSize(12);
+    doc.text(`Ajuste: R$ ${sale.adjustment.toFixed(2).replace('.', ',')}`, margin, yPos);
+    yPos += lineHeight;
+    doc.text(`TOTAL: R$ ${sale.valorTotal.toFixed(2).replace('.', ',')}`, margin, yPos);
+    doc.text(`Pagamento: ${sale.tipoPagamento}`, margin, yPos + lineHeight);
+    yPos += lineHeight * 2;
+    if (sale.tipoPagamento === "Dinheiro") {
+      const change = amountGiven - sale.valorTotal;
+      doc.text(`Valor Recebido: R$ ${amountGiven.toFixed(2).replace('.', ',')}`, margin, yPos);
+      yPos += lineHeight;
+      doc.text(`Troco: R$ ${change.toFixed(2).replace('.', ',')}`, margin, yPos);
+      yPos += lineHeight;
+    }
+    doc.text("-----------------------------------------", margin, yPos);
+    yPos += lineHeight;
+    doc.setFontSize(10);
+    doc.text("Obrigado pela preferência!", doc.internal.pageSize.getWidth() / 2, yPos, { align: 'center' });
+    doc.save(`venda_${new Date(sale.dataVenda).getTime()}.pdf`);
+  }
+  // --- Gerenciamento de Caixa ---
+  function loadCashData(uid) {
+    const today = new Date().toISOString().split('T')[0];
+    const cashRef = ref(db, `cash/${uid}/${today}`);
+    onValue(cashRef, snapshot => {
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        cashOpened = data.finalCash === undefined;
+        openerName = data.openerName || '';
+        closerName = data.closerName || '';
+        openingTimestamp = data.openingTimestamp || '';
+        closingTimestamp = data.closingTimestamp || '';
+        initialCash = data.initial || 0;
+        cashOperations = data.operations || [];
+        dailySalesByPayment = data.salesByPayment || {
+          Pix: 0,
+          Dinheiro: 0,
+          Credito: 0,
+          Debito: 0,
+          Outro: 0
+        };
+        finalCash = data.finalCash || 0;
+        difference = data.difference || 0;
+        document.getElementById("openCashBtn").disabled = cashOpened;
+        document.getElementById("registerCashOperationBtn").disabled = !cashOpened;
+        document.getElementById("closeCashBtn").disabled = !cashOpened;
+        document.getElementById("finalCashCount").disabled = !cashOpened;
+        displayCashOperations();
+        if (data.finalCash !== undefined) {
+          displayClosingReport();
+          document.getElementById("closingReportSection").style.display = "block";
+          document.getElementById("cashOperationsList").style.display = "none";
+          document.getElementById("exportClosingPdfBtn").style.display = "inline-block";
+          document.getElementById("confirmClosingBtn").style.display = "none";
+          document.getElementById("cancelClosingBtn").style.display = "none";
+          document.getElementById("closerName").disabled = true;
+        } else {
+          document.getElementById("closingReportSection").style.display = "none";
+          document.getElementById("cashOperationsList").style.display = "block";
+          document.getElementById("closerName").disabled = false;
+        }
+      } else {
+        cashOpened = false;
+        openerName = '';
+        closerName = '';
+        openingTimestamp = '';
+        closingTimestamp = '';
+        initialCash = 0;
+        cashOperations = [];
+        dailySalesByPayment = {
+          Pix: 0,
+          Dinheiro: 0,
+          Credito: 0,
+          Debito: 0,
+          Outro: 0
+        };
+        finalCash = 0;
+        difference = 0;
+        document.getElementById("openCashBtn").disabled = false;
+        document.getElementById("registerCashOperationBtn").disabled = true;
+        document.getElementById("closeCashBtn").disabled = true;
+        document.getElementById("finalCashCount").disabled = true;
+        document.getElementById("cashOperationsList").innerHTML = "";
+        document.getElementById("closingReportSection").style.display = "none";
+      }
+    });
+  }
+  document.getElementById("openCashBtn").onclick = () => {
+    const name = document.getElementById("openerName").value.trim();
+    if (!name) {
+      alert("Informe o nome do operador que abre o caixa.");
+      return;
+    }
+    const amount = parseFloat(document.getElementById("initialCash").value) || 0;
+    if (amount < 0) {
+      alert("O suprimento inicial não pode ser negativo.");
+      return;
+    }
+    const user = auth.currentUser;
+    if (user) {
+      const today = new Date().toISOString().split('T')[0];
+      const cashRef = ref(db, `cash/${user.uid}/${today}`);
+      set(cashRef, {
+        openerName: name,
+        initial: amount,
+        openingTimestamp: new Date().toLocaleString('pt-BR'),
+        operations: [],
+        salesByPayment: {
+          Pix: 0,
+          Dinheiro: 0,
+          Credito: 0,
+          Debito: 0,
+          Outro: 0
+        }
+      }).then(() => {
+        alert("Caixa aberto com suprimento inicial!");
+        document.getElementById("openerName").value = "";
+        document.getElementById("initialCash").value = "";
+      });
+    }
+  };
+  document.getElementById("registerCashOperationBtn").onclick = () => {
+    if (!cashOpened) {
+      alert("Abra o caixa primeiro.");
+      return;
+    }
+    const amount = parseFloat(document.getElementById("cashOperationAmount").value) || 0;
+    const type = document.getElementById("cashOperationType").value;
+    const note = document.getElementById("cashOperationNote").value.trim();
+    if (amount <= 0) {
+      alert("O valor deve ser maior que zero.");
+      return;
+    }
+    const operation = {
+      type: type,
+      amount: type === "sangria" ? -amount : amount,
+      note: note,
+      timestamp: new Date().toLocaleString('pt-BR')
+    };
+    cashOperations.push(operation);
+    saveCashOperations();
+    displayCashOperations();
+    document.getElementById("cashOperationAmount").value = "";
+    document.getElementById("cashOperationNote").value = "";
+  };
 
-    <section class="category" id="história-section">
-      <h2>História</h2>
-      <div class="video-list" id="história-videos"></div>
-    </section>
+  function displayCashOperations() {
+    const listDiv = document.getElementById("cashOperationsList");
+    listDiv.innerHTML = "";
+    cashOperations.forEach(op => {
+      const div = document.createElement("div");
+      div.textContent = `${op.timestamp} - ${op.type.toUpperCase()}: R$ ${Math.abs(op.amount).toFixed(2).replace('.', ',')} (${op.note})`;
+      listDiv.appendChild(div);
+    });
+  }
 
-    <section class="category" id="future-category">
-      <h2>Em Breve: Novas Categorias</h2>
-      <p>Estamos adicionando mais matérias em breve!</p>
-    </section>
-  </main>
-</body>
+  function saveCashOperations() {
+    const user = auth.currentUser;
+    if (user) {
+      const today = new Date().toISOString().split('T')[0];
+      const cashRef = ref(db, `cash/${user.uid}/${today}`);
+      update(cashRef, {
+        operations: cashOperations,
+        salesByPayment: dailySalesByPayment
+      });
+    }
+  }
+
+  function updateDailySalesByPayment(paymentType, amount) {
+    if (dailySalesByPayment[paymentType] !== undefined) {
+      dailySalesByPayment[paymentType] += amount;
+      saveCashOperations();
+    }
+  }
+  document.getElementById("closeCashBtn").onclick = () => {
+    if (!cashOpened) {
+      alert("Caixa não aberto.");
+      return;
+    }
+    const name = document.getElementById("closerName").value.trim();
+    if (!name) {
+      alert("Informe o nome do operador que fecha o caixa.");
+      return;
+    }
+    closerName = name;
+    const finalCashInput = parseFloat(document.getElementById("finalCashCount").value) || 0;
+    let totalCashOperations = cashOperations.reduce((sum, op) => sum + op.amount, 0);
+    let expectedCash = initialCash + dailySalesByPayment.Dinheiro + totalCashOperations;
+    let differenceCalc = finalCashInput - expectedCash;
+    const tempFinal = finalCash;
+    const tempDiff = difference;
+    finalCash = finalCashInput;
+    difference = differenceCalc;
+    displayClosingReport();
+    document.getElementById("closingReportSection").style.display = "block";
+    document.getElementById("cashOperationsList").style.display = "none";
+    document.getElementById("exportClosingPdfBtn").style.display = "none";
+    document.getElementById("confirmClosingBtn").style.display = "inline-block";
+    document.getElementById("cancelClosingBtn").style.display = "inline-block";
+  };
+  document.getElementById("confirmClosingBtn").onclick = () => {
+    const user = auth.currentUser;
+    if (user) {
+      const today = new Date().toISOString().split('T')[0];
+      const cashRef = ref(db, `cash/${user.uid}/${today}`);
+      update(cashRef, {
+        finalCash: finalCash,
+        difference: difference,
+        closerName: closerName,
+        closingTimestamp: new Date().toLocaleString('pt-BR')
+      }).then(() => {
+        alert("Fechamento salvo!");
+        document.getElementById("exportClosingPdfBtn").style.display = "inline-block";
+        document.getElementById("confirmClosingBtn").style.display = "none";
+        document.getElementById("cancelClosingBtn").style.display = "none";
+        document.getElementById("closingReportSection").querySelector("h4").textContent = "Relatório de Fechamento";
+      });
+    }
+  };
+  document.getElementById("cancelClosingBtn").onclick = () => {
+    finalCash = 0;
+    difference = 0;
+    document.getElementById("closingReportSection").style.display = "none";
+    document.getElementById("cashOperationsList").style.display = "block";
+    document.getElementById("finalCashCount").value = "";
+    document.getElementById("closerName").value = "";
+  };
+
+  function displayClosingReport() {
+    let totalCashOperations = cashOperations.reduce((sum, op) => sum + op.amount, 0);
+    let expectedCash = initialCash + dailySalesByPayment.Dinheiro + totalCashOperations;
+    const totalsDiv = document.getElementById("closingTotals");
+    totalsDiv.innerHTML = `
+      <p>Aberto por: ${openerName} em ${openingTimestamp}</p>
+      <p>Suprimento Inicial: R$ ${initialCash.toFixed(2).replace('.', ',')}</p>
+      <p>Vendas em Pix: R$ ${dailySalesByPayment.Pix.toFixed(2).replace('.', ',')}</p>
+      <p>Vendas em Dinheiro: R$ ${dailySalesByPayment.Dinheiro.toFixed(2).replace('.', ',')}</p>
+      <p>Vendas em Crédito: R$ ${dailySalesByPayment.Credito.toFixed(2).replace('.', ',')}</p>
+      <p>Vendas em Débito: R$ ${dailySalesByPayment.Debito.toFixed(2).replace('.', ',')}</p>
+      <p>Vendas em Outro: R$ ${dailySalesByPayment.Outro.toFixed(2).replace('.', ',')}</p>
+      <p>Total Operações de Caixa: R$ ${totalCashOperations.toFixed(2).replace('.', ',')}</p>
+      <p>Caixa Esperado (a manter em dinheiro): R$ ${expectedCash.toFixed(2).replace('.', ',')}</p>
+      <p>Contagem Final: R$ ${finalCash.toFixed(2).replace('.', ',')}</p>
+      <p>Fechado por: ${closerName} em ${closingTimestamp}</p>
+    `;
+    document.getElementById("cashDifference").textContent = `Diferença: R$ ${difference.toFixed(2).replace('.', ',')}`;
+  }
+  document.getElementById("exportClosingPdfBtn").onclick = () => {
+    const {
+      jsPDF
+    } = window.jspdf;
+    const doc = new jsPDF();
+    doc.setFontSize(16);
+    doc.text("Relatório de Fechamento de Caixa", 10, 10);
+    const today = new Date().toLocaleDateString('pt-BR');
+    doc.setFontSize(10);
+    doc.text(`Data: ${today}`, 10, 20);
+    const tableColumn = ["Descrição", "Valor (R$)"];
+    const tableRows = [
+      ["Aberto por", `${openerName} em ${openingTimestamp}`],
+      ["Suprimento Inicial", initialCash.toFixed(2).replace('.', ',')],
+      ["Vendas em Pix", dailySalesByPayment.Pix.toFixed(2).replace('.', ',')],
+      ["Vendas em Dinheiro", dailySalesByPayment.Dinheiro.toFixed(2).replace('.', ',')],
+      ["Vendas em Crédito", dailySalesByPayment.Credito.toFixed(2).replace('.', ',')],
+      ["Vendas em Débito", dailySalesByPayment.Debito.toFixed(2).replace('.', ',')],
+      ["Vendas em Outro", dailySalesByPayment.Outro.toFixed(2).replace('.', ',')],
+      ["Total Operações de Caixa", cashOperations.reduce((sum, op) => sum + op.amount, 0).toFixed(2).replace('.', ',')],
+      ["Caixa Esperado (a manter em dinheiro)", (initialCash + dailySalesByPayment.Dinheiro + cashOperations.reduce((sum, op) => sum + op.amount, 0)).toFixed(2).replace('.', ',')],
+      ["Contagem Final", finalCash.toFixed(2).replace('.', ',')],
+      ["Diferença", difference.toFixed(2).replace('.', ',')],
+      ["Fechado por", `${closerName} em ${closingTimestamp}`]
+    ];
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+      startY: 30
+    });
+    doc.save(`fechamento_caixa_${today.replace(/\//g, '-')}.pdf`);
+  };
+  // --- Movimentações de Caixa Filtradas ---
+  function loadAllCashAndFilter(uid) {
+    const cashRef = ref(db, `cash/${uid}`);
+    onValue(cashRef, snapshot => {
+      allCashData = [];
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        Object.entries(data).forEach(([date, dayData]) => {
+          allCashData.push({
+            date,
+            openerName: dayData.openerName || '',
+            openingTimestamp: dayData.openingTimestamp || '',
+            closerName: dayData.closerName || '',
+            closingTimestamp: dayData.closingTimestamp || '',
+            initial: dayData.initial || 0,
+            operations: dayData.operations || [],
+            salesByPayment: dayData.salesByPayment || {
+              Pix: 0,
+              Dinheiro: 0,
+              Credito: 0,
+              Debito: 0,
+              Outro: 0
+            },
+            finalCash: dayData.finalCash || 0,
+            difference: dayData.difference || 0
+          });
+        });
+      }
+      applyCashFiltersAndDisplay();
+    });
+  }
+
+  function applyCashFiltersAndDisplay() {
+    const container = document.getElementById("cashMovList");
+    container.innerHTML = "";
+    let totalMov = 0;
+    const filterDateStartStr = document.getElementById("filterCashDateStart").value;
+    const filterDateEndStr = document.getElementById("filterCashDateEnd").value;
+    const filterType = document.getElementById("filterCashType").value;
+    const filterDateStart = filterDateStartStr ? new Date(filterDateStartStr + 'T00:00:00') : null;
+    const filterDateEnd = filterDateEndStr ? new Date(filterDateEndStr + 'T23:59:59') : null;
+    filteredCashOperations = [];
+    allCashData.forEach(day => {
+      const dayDateParts = day.date.split('-');
+      const dayDate = new Date(dayDateParts[0], dayDateParts[1] - 1, dayDateParts[2]);
+      if ((!filterDateStart || dayDate >= filterDateStart) && (!filterDateEnd || dayDate <= filterDateEnd)) {
+        if (filterType === "Todos" || filterType === "suprimento") {
+          filteredCashOperations.push({
+            date: day.date,
+            type: 'abertura',
+            amount: day.initial,
+            note: `Aberto por: ${day.openerName} em ${day.openingTimestamp}`
+          });
+          totalMov += day.initial;
+        }
+        day.operations.forEach(op => {
+          if (filterType === "Todos" || op.type === filterType) {
+            filteredCashOperations.push({
+              date: day.date,
+              ...op
+            });
+            totalMov += op.amount;
+          }
+        });
+        if (day.finalCash !== 0 && (filterType === "Todos" || filterType === "sangria")) {
+          filteredCashOperations.push({
+            date: day.date,
+            type: 'fechamento',
+            amount: day.finalCash,
+            note: `Fechado por: ${day.closerName || 'N/A'} em ${day.closingTimestamp} | Diferença: ${day.difference.toFixed(2).replace('.', ',')}`
+          });
+        }
+      }
+    });
+    if (filteredCashOperations.length > 0) {
+      const table = document.createElement("table");
+      table.innerHTML = `
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Tipo</th>
+            <th>Valor (R$)</th>
+            <th>Observação</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${filteredCashOperations.map(op => `
+            <tr>
+              <td>${op.date}</td>
+              <td>${op.type}</td>
+              <td>${op.amount.toFixed(2).replace('.', ',')}</td>
+              <td>${op.note || op.timestamp + ' - ' + op.note}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      `;
+      container.appendChild(table);
+    } else {
+      container.innerHTML = "<p>Nenhuma movimentação encontrada.</p>";
+    }
+    document.getElementById("totalCashMovValue").textContent = `R$ ${totalMov.toFixed(2).replace('.', ',')}`;
+  }
+  document.getElementById("applyCashFiltersBtn").onclick = () => {
+    applyCashFiltersAndDisplay();
+  };
+  document.getElementById("toggleCashListBtn").onclick = () => {
+    const cashMovDiv = document.getElementById("cashMovList");
+    const toggleBtn = document.getElementById("toggleCashListBtn");
+    if (cashMovDiv.style.display === "none") {
+      cashMovDiv.style.display = "block";
+      toggleBtn.textContent = "Ocultar Movimentações";
+    } else {
+      cashMovDiv.style.display = "none";
+      toggleBtn.textContent = "Mostrar Movimentações";
+    }
+  };
+  document.getElementById("exportCashMovPdfBtn").onclick = () => {
+    if (filteredCashOperations.length === 0) {
+      alert("Não há movimentações para exportar.");
+      return;
+    }
+    const {
+      jsPDF
+    } = window.jspdf;
+    const doc = new jsPDF();
+    doc.setFontSize(16);
+    doc.text("Relatório de Movimentações de Caixa Filtradas", 10, 10);
+    const tableColumn = ["Data", "Tipo", "Valor (R$)", "Observação"];
+    const tableRows = filteredCashOperations.map(op => [
+      op.date,
+      op.type,
+      op.amount.toFixed(2).replace('.', ','),
+      op.note
+    ]);
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+      startY: 20,
+      styles: {
+        fontSize: 8,
+        cellPadding: 2,
+        overflow: 'linebreak'
+      },
+      headStyles: {
+        fillColor: [41, 128, 185],
+        textColor: [255, 255, 255]
+      },
+      alternateRowStyles: {
+        fillColor: [240, 240, 240]
+      }
+    });
+    doc.save("relatorio_movimentacoes_caixa.pdf");
+  };
+  document.getElementById("submitSale").onclick = () => {
+    updateDataVenda();
+    const valorTotal = parseFloat(document.getElementById("valorTotal").value) || 0;
+    const tipoPagamento = document.getElementById("tipoPagamento").value;
+    const observacoes = document.getElementById("observacoes").value;
+    const dataVenda = document.getElementById("dataVenda").value;
+    if (valorTotal <= 0) {
+      alert("O valor total da venda deve ser maior que zero.");
+      return;
+    }
+    if (!dataVenda) {
+      alert("Por favor, preencha a data e hora da venda.");
+      return;
+    }
+    const user = auth.currentUser;
+    if (user) {
+      // Obter e incrementar o contador de vendas
+      const counterRef = ref(db, `counters/${user.uid}/saleNumber`);
+      runTransaction(counterRef, (current) => {
+        return (current || 0) + 1;
+      }).then((transaction) => {
+        const saleNumber = transaction.snapshot.val();
+        const data = {
+          saleNumber: saleNumber,
+          dataVenda: dataVenda,
+          valorTotal: valorTotal,
+          tipoPagamento: tipoPagamento,
+          observacoes: observacoes,
+          items: []
+        };
+        const baseRef = ref(db, `vendas/${user.uid}`);
+        const newSaleRef = push(baseRef);
+        set(newSaleRef, data).then(() => {
+          alert("Venda registrada!");
+          updateDailySalesByPayment(tipoPagamento, valorTotal);
+          limparFormulario();
+          loadAllSalesAndFilter(user.uid);
+        }).catch(err => alert("Erro ao registrar venda: " + err.message));
+      }).catch(err => alert("Erro ao gerar número da venda: " + err.message));
+    } else {
+      alert("Você precisa estar logado para registrar vendas.");
+    }
+  };
+
+  function loadAllSalesAndFilter(uid) {
+    const vendasRef = ref(db, `vendas/${uid}`);
+    onValue(vendasRef, snapshot => {
+      allSalesData = [];
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        Object.entries(data).forEach(([key, item]) => {
+          allSalesData.push({
+            id: key,
+            ...item
+          });
+        });
+      }
+      applyFiltersAndDisplaySales();
+      calculateAndDisplayPeriodTotals(allSalesData);
+      updateRankingDisplay();
+    });
+  }
+
+  function applyFiltersAndDisplaySales() {
+    const container = document.getElementById("saleList");
+    container.innerHTML = "";
+    let currentTotalSales = 0;
+    const filterDateStartStr = document.getElementById("filterDateStart").value;
+    const filterDateEndStr = document.getElementById("filterDateEnd").value;
+    const filterPaymentType = document.getElementById("filterPaymentType").value;
+    const filterDateStart = filterDateStartStr ? new Date(filterDateStartStr + 'T00:00:00') : null;
+    const filterDateEnd = filterDateEndStr ? new Date(filterDateEndStr + 'T23:59:59') : null;
+    filteredSalesData = allSalesData.filter(sale => {
+      const saleDate = new Date(sale.dataVenda);
+      const matchesDate = (!filterDateStart || saleDate >= filterDateStart) &&
+        (!filterDateEnd || saleDate <= filterDateEnd);
+      const matchesPaymentType = (filterPaymentType === "Todos" || sale.tipoPagamento === filterPaymentType);
+      return matchesDate && matchesPaymentType;
+    });
+    if (filteredSalesData.length > 0) {
+      filteredSalesData.forEach(item => {
+        currentTotalSales += item.valorTotal;
+        const div = document.createElement("div");
+        div.style.border = "1px solid #ccc";
+        div.style.margin = "10px";
+        div.style.padding = "10px";
+        const itemsList = item.items && item.items.length > 0 ?
+          item.items.map(i => {
+            const quantidadeDisplay = i.unidade === 'kilo' ?
+              `${(i.quantidade * 1000).toFixed(0)}g` :
+              `${i.quantidade} un`;
+            return `<li>${i.nome} (${quantidadeDisplay}, R$ ${i.preco.toFixed(2).replace('.', ',')})</li>`;
+          }).join('') : '';
+        div.innerHTML = `
+        <strong>Venda Nº:</strong> ${item.saleNumber || 'N/A'}
+
+        <strong>Data/Hora:</strong> ${item.dataVenda ? new Date(item.dataVenda).toLocaleString('pt-BR') : 'N/A'}
+
+        <strong>Valor Total:</strong> R$ ${item.valorTotal ? item.valorTotal.toFixed(2).replace('.', ',') : '0,00'}
+
+        <strong>Tipo de Pagamento:</strong> ${item.tipoPagamento}
+
+        <strong>Obs.:</strong> ${item.observacoes || 'N/A'}
+
+        ${itemsList ? `<strong>Itens:</strong><ul>${itemsList}</ul>` : ''}
+        <button onclick="excluirVenda('${item.id}')">Excluir</button>
+      `;
+        container.appendChild(div);
+      });
+    } else {
+      container.innerHTML = "Nenhuma venda encontrada com os filtros aplicados.";
+    }
+    document.getElementById("totalSalesValue").textContent = `R$ ${currentTotalSales.toFixed(2).replace('.', ',')}`;
+    updateRankingDisplay();
+  }
+  // --- Função para calcular e exibir o ranking dos produtos mais vendidos ---
+  function updateRankingDisplay() {
+    const rankingListDiv = document.getElementById("rankingList");
+    rankingListDiv.innerHTML = "";
+    // Agrupar itens por produto
+    const productSales = {};
+    filteredSalesData.forEach(sale => {
+      if (sale.items && sale.items.length > 0) {
+        sale.items.forEach(item => {
+          const productCode = item.codigo.startsWith('2') && item.codigo.length === 13 ? item.codigo.slice(1, 7) : item.codigo;
+          if (!productSales[productCode]) {
+            productSales[productCode] = {
+              nome: item.nome,
+              unidade: item.unidade,
+              quantidade: 0,
+              valorTotal: 0
+            };
+          }
+          productSales[productCode].quantidade += item.quantidade;
+          productSales[productCode].valorTotal += item.preco;
+        });
+      }
+    });
+    // Converter para array e ordenar por quantidade decrescente
+    const ranking = Object.entries(productSales)
+      .map(([code, data]) => ({
+        code,
+        ...data
+      }))
+      .sort((a, b) => b.quantidade - a.quantidade);
+    if (ranking.length === 0) {
+      rankingListDiv.innerHTML = "<p>Nenhum dado de vendas para exibir o ranking.</p>";
+      return;
+    }
+    const table = document.createElement("table");
+    table.style.width = "100%";
+    table.style.borderCollapse = "collapse";
+    table.innerHTML = `
+    <thead>
+      <tr style="background-color: #007bff; color: white;">
+        <th style="padding: 10px; border: 1px solid #ddd;">Posição</th>
+        <th style="padding: 10px; border: 1px solid #ddd;">Código</th>
+        <th style="padding: 10px; border: 1px solid #ddd;">Nome</th>
+        <th style="padding: 10px; border: 1px solid #ddd;">Unidade</th>
+        <th style="padding: 10px; border: 1px solid #ddd;">Quantidade Vendida</th>
+        <th style="padding: 10px; border: 1px solid #ddd;">Valor Total (R$)</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${ranking.map((product, index) => `
+        <tr>
+          <td style="padding: 10px; border: 1px solid #ddd;">${index + 1}</td>
+          <td style="padding: 10px; border: 1px solid #ddd;">${product.code}</td>
+          <td style="padding: 10px; border: 1px solid #ddd;">${product.nome}</td>
+          <td style="padding: 10px; border: 1px solid #ddd;">${product.unidade === 'kilo' ? 'Kilo' : 'Unidade'}</td>
+          <td style="padding: 10px; border: 1px solid #ddd;">${product.unidade === 'kilo' ? (product.quantidade * 1000).toFixed(0) + 'g' : product.quantidade + ' un'}</td>
+          <td style="padding: 10px; border: 1px solid #ddd;">${product.valorTotal.toFixed(2).replace('.', ',')}</td>
+        </tr>
+      `).join('')}
+    </tbody>
+  `;
+    rankingListDiv.appendChild(table);
+  }
+  // --- Função para exportar o ranking em PDF ---
+  document.getElementById("exportRankingPdfBtn").onclick = () => {
+    const productSales = {};
+    filteredSalesData.forEach(sale => {
+      if (sale.items && sale.items.length > 0) {
+        sale.items.forEach(item => {
+          const productCode = item.codigo.startsWith('2') && item.codigo.length === 13 ? item.codigo.slice(1, 7) : item.codigo;
+          if (!productSales[productCode]) {
+            productSales[productCode] = {
+              nome: item.nome,
+              unidade: item.unidade,
+              quantidade: 0,
+              valorTotal: 0
+            };
+          }
+          productSales[productCode].quantidade += item.quantidade;
+          productSales[productCode].valorTotal += item.preco;
+        });
+      }
+    });
+    const ranking = Object.entries(productSales)
+      .map(([code, data]) => ({
+        code,
+        ...data
+      }))
+      .sort((a, b) => b.quantidade - a.quantidade);
+    if (ranking.length === 0) {
+      alert("Não há dados de vendas para exportar o ranking.");
+      return;
+    }
+    const {
+      jsPDF
+    } = window.jspdf;
+    const doc = new jsPDF();
+    doc.setFontSize(16);
+    doc.text("Ranking de Produtos Mais Vendidos", 10, 10);
+    const filterDateStartStr = document.getElementById("filterDateStart").value;
+    const filterDateEndStr = document.getElementById("filterDateEnd").value;
+    const filterPaymentType = document.getElementById("filterPaymentType").value;
+    let filterText = `Período: ${filterDateStartStr || 'Início'} até ${filterDateEndStr || 'Hoje'}`;
+    filterText += `\nTipo de Pagamento: ${filterPaymentType === 'Todos' ? 'Todos' : filterPaymentType}`;
+    doc.setFontSize(10);
+    doc.text(filterText, 10, 20);
+    const tableColumn = ["Posição", "Código", "Nome", "Unidade", "Quantidade Vendida", "Valor Total (R$)"];
+    const tableRows = ranking.map((product, index) => [
+      index + 1,
+      product.code,
+      product.nome,
+      product.unidade === 'kilo' ? 'Kilo' : 'Unidade',
+      product.unidade === 'kilo' ? `${(product.quantidade * 1000).toFixed(0)}g` : `${product.quantidade} un`,
+      `R$ ${product.valorTotal.toFixed(2).replace('.', ',')}`
+    ]);
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+      startY: 30,
+      styles: {
+        fontSize: 8,
+        cellPadding: 2,
+        overflow: 'linebreak'
+      },
+      headStyles: {
+        fillColor: [41, 128, 185],
+        textColor: [255, 255, 255]
+      },
+      alternateRowStyles: {
+        fillColor: [240, 240, 240]
+      }
+    });
+    doc.save("ranking_produtos_vendidos.pdf");
+  };
+  // --- Função para exportar o estoque em PDF ---
+  document.getElementById("exportStockPdfBtn").onclick = () => {
+    if (Object.keys(productsDatabase).length === 0) {
+      alert("Não há produtos cadastrados para exportar o estoque.");
+      return;
+    }
+    const {
+      jsPDF
+    } = window.jspdf;
+    const doc = new jsPDF();
+    doc.setFontSize(16);
+    doc.text("Relatório de Estoque Atual", 10, 10);
+    doc.setFontSize(10);
+    doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, 10, 20);
+    const tableColumn = ["Código", "Nome", "Preço (R$)", "Unidade", "Estoque"];
+    const tableRows = Object.entries(productsDatabase).map(([barcode, product]) => [
+      barcode,
+      product.nome,
+      `R$ ${product.preco.toFixed(2).replace('.', ',')}`,
+      product.unidade === 'kilo' ? 'Kilo' : 'Unidade',
+      `${(product.estoque || 0).toFixed(3).replace('.', ',')} ${product.unidade === 'kilo' ? 'kg' : 'un'}`
+    ]);
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+      startY: 30,
+      styles: {
+        fontSize: 8,
+        cellPadding: 2,
+        overflow: 'linebreak'
+      },
+      headStyles: {
+        fillColor: [41, 128, 185],
+        textColor: [255, 255, 255]
+      },
+      alternateRowStyles: {
+        fillColor: [240, 240, 240]
+      }
+    });
+    doc.save("relatorio_estoque_atual.pdf");
+  };
+  document.getElementById("applyFiltersBtn").onclick = () => {
+    applyFiltersAndDisplaySales();
+  };
+
+  function calculateAndDisplayPeriodTotals(sales) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay());
+    startOfWeek.setHours(0, 0, 0, 0);
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    endOfWeek.setHours(23, 59, 59, 999);
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    startOfMonth.setHours(0, 0, 0, 0);
+    const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    endOfMonth.setHours(23, 59, 59, 999);
+    let totalDay = 0;
+    let totalWeek = 0;
+    let totalMonth = 0;
+    sales.forEach(sale => {
+      const saleDate = new Date(sale.dataVenda);
+      saleDate.setHours(0, 0, 0, 0);
+      if (saleDate.toDateString() === today.toDateString()) {
+        totalDay += sale.valorTotal;
+      }
+      if (saleDate >= startOfWeek && saleDate <= endOfWeek) {
+        totalWeek += sale.valorTotal;
+      }
+      if (saleDate >= startOfMonth && saleDate <= endOfMonth) {
+        totalMonth += sale.valorTotal;
+      }
+    });
+    document.getElementById("totalDaySales").textContent = `R$ ${totalDay.toFixed(2).replace('.', ',')}`;
+    document.getElementById("totalWeekSales").textContent = `R$ ${totalWeek.toFixed(2).replace('.', ',')}`;
+    document.getElementById("totalMonthSales").textContent = `R$ ${totalMonth.toFixed(2).replace('.', ',')}`;
+  }
+  window.excluirVenda = (id) => {
+    const user = auth.currentUser;
+    if (!user) return;
+    const confirmacao = confirm("Tem certeza que deseja excluir esta venda?");
+    if (!confirmacao) return;
+    const itemRef = ref(db, `vendas/${user.uid}/${id}`);
+    remove(itemRef)
+      .then(() => {
+        alert("Venda excluída com sucesso!");
+        loadAllSalesAndFilter(user.uid);
+      })
+      .catch(err => alert("Erro ao excluir: " + err.message));
+  };
+
+  function limparFormulario() {
+    document.getElementById("valorTotal").value = "";
+    document.getElementById("tipoPagamento").value = "Pix";
+    document.getElementById("observacoes").value = "";
+    updateDataVenda();
+  }
+  document.getElementById("exportPdfBtn").onclick = () => {
+    if (filteredSalesData.length === 0) {
+      alert("Não há vendas para exportar.");
+      return;
+    }
+    const {
+      jsPDF
+    } = window.jspdf;
+    const doc = new jsPDF();
+    doc.setFontSize(16);
+    doc.text("Relatório de Vendas Filtradas", 10, 10);
+    const tableColumn = ["Venda Nº", "Data/Hora", "Valor Total", "Tipo Pagamento", "Observações", "Itens"];
+    const tableRows = [];
+    filteredSalesData.forEach(sale => {
+      const itemsList = sale.items && sale.items.length > 0 ?
+        sale.items.map(item => {
+          const quantidadeDisplay = item.unidade === 'kilo' ?
+            `${(item.quantidade * 1000).toFixed(0)}g` :
+            `${item.quantidade} un`;
+          return `${item.nome} (${quantidadeDisplay}, R$ ${item.preco.toFixed(2).replace('.', ',')})`;
+        }).join('\n') : 'N/A';
+      const saleData = [
+        sale.saleNumber || 'N/A',
+        sale.dataVenda ? new Date(sale.dataVenda).toLocaleString('pt-BR') : 'N/A',
+        `R$ ${sale.valorTotal ? sale.valorTotal.toFixed(2).replace('.', ',') : '0,00'}`,
+        sale.tipoPagamento,
+        sale.observacoes || 'N/A',
+        itemsList
+      ];
+      tableRows.push(saleData);
+    });
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+      startY: 20,
+      styles: {
+        fontSize: 8,
+        cellPadding: 2,
+        overflow: 'linebreak'
+      },
+      headStyles: {
+        fillColor: [41, 128, 185],
+        textColor: [255, 255, 255]
+      },
+      alternateRowStyles: {
+        fillColor: [240, 240, 240]
+      }
+    });
+    doc.save("relatorio_vendas_filtradas.pdf");
+  };
+  document.getElementById("exportExcelBtn").onclick = () => {
+    if (filteredSalesData.length === 0) {
+      alert("Não há vendas para exportar.");
+      return;
+    }
+    const dataToExport = filteredSalesData.map(sale => {
+      const itemsDetail = sale.items && sale.items.length > 0 ?
+        sale.items.map(item => {
+          const quantidadeDisplay = item.unidade === 'kilo' ?
+            `${(item.quantidade * 1000).toFixed(0)}g` :
+            `${item.quantidade} un`;
+          return `${item.nome} (${quantidadeDisplay}, R$ ${item.preco.toFixed(2).replace('.', ',')})`;
+        }).join('; ') : '';
+      return {
+        "Venda Nº": sale.saleNumber || 'N/A',
+        "Data/Hora da Venda": sale.dataVenda ? new Date(sale.dataVenda).toLocaleString('pt-BR') : 'N/A',
+        "Valor Total": sale.valorTotal,
+        "Tipo de Pagamento": sale.tipoPagamento,
+        "Observações": sale.observacoes || 'N/A',
+        "Itens da Venda": itemsDetail
+      };
+    });
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Vendas");
+    XLSX.writeFile(workbook, "relatorio_vendas.xlsx");
+  };
+  document.getElementById("sendReportBtn").onclick = () => {
+    const phoneNumber = document.getElementById("phoneNumber").value.trim();
+    if (!phoneNumber) {
+      alert("Por favor, insira um número de telefone.");
+      return;
+    }
+    if (filteredSalesData.length === 0) {
+      alert("Não há vendas para enviar no relatório.");
+      return;
+    }
+    let reportMessage = "Relatório de Vendas Filtradas:\n\n";
+    filteredSalesData.forEach(sale => {
+      reportMessage += `Venda Nº: ${sale.saleNumber || 'N/A'}\n`;
+      reportMessage += `Data/Hora: ${sale.dataVenda ? new Date(sale.dataVenda).toLocaleString('pt-BR') : 'N/A'}\n`;
+      reportMessage += `Valor Total: R$ ${sale.valorTotal ? sale.valorTotal.toFixed(2).replace('.', ',') : '0,00'}\n`;
+      reportMessage += `Tipo de Pagamento: ${sale.tipoPagamento}\n`;
+      reportMessage += `Obs.: ${sale.observacoes || 'N/A'}\n`;
+      if (sale.items && sale.items.length > 0) {
+        reportMessage += "Itens:\n";
+        sale.items.forEach(item => {
+          const quantidadeDisplay = item.unidade === 'kilo' ?
+            `${(item.quantidade * 1000).toFixed(0)}g` :
+            `${item.quantidade} un`;
+          reportMessage += ` - ${item.nome} (${quantidadeDisplay}, R$ ${item.preco.toFixed(2).replace('.', ',')})\n`;
+        });
+      }
+      reportMessage += "--------------------------------------\n";
+    });
+    reportMessage += `\nTotal Geral das Vendas Filtradas: R$ ${filteredSalesData.reduce((acc, sale) => acc + sale.valorTotal, 0).toFixed(2).replace('.', ',')}`;
+    const confirmSend = confirm("Isso abrirá o WhatsApp/SMS com a mensagem preenchida. Deseja continuar?");
+    if (confirmSend) {
+      const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(reportMessage)}`;
+      window.open(whatsappUrl, '_blank');
+      alert("Tentando abrir o WhatsApp para enviar o relatório. Se não funcionar, verifique se o número está correto e se o WhatsApp está configurado.");
+    }
+  };
+  // --- Integração do Leitor de XML ---
+  let duplicataCounter = 1;
+  let totalNotaValue = 0;
+  let notaData = null;
+  let notes = []; // To store multiple notes
+  let apGenerated = false;
+
+  function loadNotasEntradas(uid) {
+    const notasRef = ref(db, `notasEntradas/${uid}`);
+    onValue(notasRef, snapshot => {
+      notes = [];
+      if (snapshot.exists()) {
+        snapshot.forEach(child => {
+          notes.push({
+            id: child.key,
+            processed: false,
+            ...child.val()
+          });
+        });
+      }
+      renderNotesList();
+    });
+  }
+  window.loadXML = () => {
+    const file = document.getElementById('xmlFile').files[0];
+    if (!file) {
+      alert('Selecione um arquivo XML');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const xmlText = e.target.result;
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+
+      // Namespace
+      const ns = 'http://www.portalfiscal.inf.br/nfe';
+
+      // Extract data
+      const infNFe = xmlDoc.getElementsByTagNameNS(ns, 'infNFe')[0];
+      const ide = xmlDoc.getElementsByTagNameNS(ns, 'ide')[0];
+      const emit = xmlDoc.getElementsByTagNameNS(ns, 'emit')[0];
+      const dest = xmlDoc.getElementsByTagNameNS(ns, 'dest')[0];
+      const dets = xmlDoc.getElementsByTagNameNS(ns, 'det');
+      const total = xmlDoc.getElementsByTagNameNS(ns, 'total')[0];
+      const ICMSTot = xmlDoc.getElementsByTagNameNS(ns, 'ICMSTot')[0];
+      const transp = xmlDoc.getElementsByTagNameNS(ns, 'transp')[0];
+      const cobr = xmlDoc.getElementsByTagNameNS(ns, 'cobr')[0];
+
+      // Fill fields
+      document.getElementById('filial').value = dest ? dest.getElementsByTagNameNS(ns, 'xNome')[0]?.textContent : '';
+      document.getElementById('fornecedor').value = emit ? emit.getElementsByTagNameNS(ns, 'CNPJ')[0]?.textContent + ' - ' + emit.getElementsByTagNameNS(ns, 'xNome')[0]?.textContent : '';
+      document.getElementById('modelo').value = ide ? ide.getElementsByTagNameNS(ns, 'mod')[0]?.textContent + ' - NOTA FISCAL ELETRÔNICA' : '';
+      document.getElementById('serie').value = ide ? ide.getElementsByTagNameNS(ns, 'serie')[0]?.textContent : '';
+      document.getElementById('numero').value = ide ? ide.getElementsByTagNameNS(ns, 'nNF')[0]?.textContent : '';
+      document.getElementById('dataEmissao').value = formatDate(ide ? ide.getElementsByTagNameNS(ns, 'dhEmi')[0]?.textContent : '');
+      document.getElementById('dataEntrada').value = formatDate(ide ? ide.getElementsByTagNameNS(ns, 'dhSaiEnt')[0]?.textContent : '');
+
+      // Products table
+      const tbody = document.querySelector('#produtosTable tbody');
+      tbody.innerHTML = '';
+      Array.from(dets).forEach((det, index) => {
+        const prod = det.getElementsByTagNameNS(ns, 'prod')[0];
+        const imposto = det.getElementsByTagNameNS(ns, 'imposto')[0];
+        const ICMS = imposto ? imposto.getElementsByTagNameNS(ns, 'ICMS')[0] : null;
+        const qtd = prod ? parseFloat(prod.getElementsByTagNameNS(ns, 'qCom')[0]?.textContent || 0) : 0;
+        const unid = prod ? prod.getElementsByTagNameNS(ns, 'uCom')[0]?.textContent : 'UN';
+        const preco = prod ? parseFloat(prod.getElementsByTagNameNS(ns, 'vUnCom')[0]?.textContent || 0) : 0;
+        const subtotal = (qtd * preco).toFixed(2);
+        const desconto = prod ? parseFloat(prod.getElementsByTagNameNS(ns, 'vDesc')[0]?.textContent || 0) : 0;
+        const total = (subtotal - desconto).toFixed(2);
+        const custo = 0.00; // Placeholder
+        const markup = 0.00; // Placeholder
+        const precoVenda = 0.00; // Placeholder
+        const cs = ''; // Placeholder
+        const cProd = prod ? prod.getElementsByTagNameNS(ns, 'cProd')[0]?.textContent : '';
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${index + 1}</td>
+          <td>${det.getAttribute('nItem')}</td>
+          <td><input type="text" class="editable codigo"style="
+    width: 77px;
+    height: 12px;
+" value="${cProd}"></td>
+          <td>${prod ? prod.getElementsByTagNameNS(ns, 'xProd')[0]?.textContent : ''}</td>
+          <td><input type="text" class="editable qtd"style="
+    width: 77px;
+    height: 12px;
+" value="${qtd.toFixed(2).replace('.', ',')}"></td>
+          <td><input type="text" class="editable unid" value="${unid}"></td>
+          <td><span>R$</span> <input type="text" class="editable preco" style="
+    width: 77px;
+    height: 12px;
+"value="${preco.toFixed(2).replace('.', ',')}"></td>
+          <td class="subtotal">R$ ${subtotal.replace('.', ',')}</td>
+          <td><span>R$</span> <input type="text" class="editable desconto"style="
+    width: 77px;
+    height: 12px;
+"
+           value="${desconto.toFixed(2).replace('.', ',')}"></td>
+          <td><span>R$</span> <input type="text" class="editable total"
+          style="
+    width: 77px;
+    height: 12px;
+"value="${total.replace('.', ',')}"></td>
+          <td>${prod ? prod.getElementsByTagNameNS(ns, 'CFOP')[0]?.textContent : ''}</td>
+          <td><span>R$</span> <input type="text" class="editable custo" 
+          style="
+    width: 77px;
+    height: 12px;
+"value="${custo.toFixed(2).replace('.', ',')}"></td>
+          <td><input type="text" class="editable markup" value="${markup.toFixed(2).replace('.', ',')}"> <span>%</span></td>
+          <td><span>R$</span> <input type="text" class="editable precoVenda"
+          style="
+    width: 77px;
+    height: 12px;
+" value="${precoVenda.toFixed(2).replace('.', ',')}"></td>
+          <td>${prod ? prod.getElementsByTagNameNS(ns, 'NCM')[0]?.textContent : ''}</td>
+          <td><input type="text" class="editable cs" value="${cs}"></td>
+          <td>
+            <select class="mapTo" onchange="mapProduct(this)">
+              <option value="">Novo Produto</option>
+              ${Object.entries(productsDatabase).map(([bc, p]) => `<option value="${bc}" data-unit="${p.unidade}" data-price="${p.preco}">${p.nome} (${bc})</option>`).join('')}
+            </select>
+          </td>
+          <td><button onclick="removeProductRow(this)">Remover</button></td>
+        `;
+        tbody.appendChild(row);
+      });
+      addProductEditListeners();
+      updateProductTotals();
+
+      // Totals
+      document.getElementById('baseICMS').value = ICMSTot ? ICMSTot.getElementsByTagNameNS(ns, 'vBC')[0]?.textContent.replace('.', ',') : '';
+      document.getElementById('valorICMS').value = ICMSTot ? ICMSTot.getElementsByTagNameNS(ns, 'vICMS')[0]?.textContent.replace('.', ',') : '';
+      document.getElementById('baseICMSSub').value = ICMSTot ? ICMSTot.getElementsByTagNameNS(ns, 'vBCST')[0]?.textContent.replace('.', ',') : '';
+      document.getElementById('valorICMSSub').value = ICMSTot ? ICMSTot.getElementsByTagNameNS(ns, 'vST')[0]?.textContent.replace('.', ',') : '';
+      document.getElementById('totalProdutos').value = ICMSTot ? ICMSTot.getElementsByTagNameNS(ns, 'vProd')[0]?.textContent.replace('.', ',') : '';
+      document.getElementById('totalNota').value = ICMSTot ? ICMSTot.getElementsByTagNameNS(ns, 'vNF')[0]?.textContent.replace('.', ',') : '';
+      document.getElementById('valorFrete').value = ICMSTot ? ICMSTot.getElementsByTagNameNS(ns, 'vFrete')[0]?.textContent.replace('.', ',') : '';
+      document.getElementById('valorSeguro').value = ICMSTot ? ICMSTot.getElementsByTagNameNS(ns, 'vSeg')[0]?.textContent.replace('.', ',') : '';
+      document.getElementById('desconto').value = ICMSTot ? ICMSTot.getElementsByTagNameNS(ns, 'vDesc')[0]?.textContent.replace('.', ',') : '';
+      document.getElementById('outrasDespesas').value = ICMSTot ? ICMSTot.getElementsByTagNameNS(ns, 'vOutro')[0]?.textContent.replace('.', ',') : '';
+      document.getElementById('valorIPI').value = ICMSTot ? ICMSTot.getElementsByTagNameNS(ns, 'vIPI')[0]?.textContent.replace('.', ',') : '';
+
+      totalNotaValue = parseFloat((ICMSTot ? ICMSTot.getElementsByTagNameNS(ns, 'vNF')[0]?.textContent : 0).replace(',', '.')) || 0;
+
+      // Duplicatas
+      const dupTbody = document.querySelector('#duplicatasTable tbody');
+      dupTbody.innerHTML = '';
+      duplicataCounter = 1;
+      if (cobr) {
+        const dups = cobr.getElementsByTagNameNS(ns, 'dup');
+        Array.from(dups).forEach((dup) => {
+          addDuplicataRow(
+            dup.getElementsByTagNameNS(ns, 'nDup')[0]?.textContent,
+            formatDate(dup.getElementsByTagNameNS(ns, 'dVenc')[0]?.textContent),
+            parseFloat(dup.getElementsByTagNameNS(ns, 'vDup')[0]?.textContent || 0).toFixed(2)
+          );
+        });
+      }
+      updateRemaining();
+    };
+    reader.readAsText(file);
+  };
+
+  function formatDate(dateStr) {
+    if (!dateStr) return '';
+    const dateParts = dateStr.split('T')[0].split('-');
+    return `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
+  }
+
+  function addProductEditListeners() {
+    const editables = document.querySelectorAll('.editable');
+    editables.forEach(el => {
+      el.addEventListener('input', updateProductRow);
+    });
+  }
+
+  function updateProductRow(event) {
+    const input = event.target;
+    const row = input.closest('tr');
+    const inputClass = input.classList[1]; // e.g., 'total', 'qtd', etc.
+
+    if (inputClass === 'total') {
+      // Edição do total: recalcular preco
+      let total = parseFloat(input.value.replace(',', '.')) || 0;
+      let desconto = parseFloat(row.querySelector('.desconto').value.replace(',', '.')) || 0;
+      let qtd = parseFloat(row.querySelector('.qtd').value.replace(',', '.')) || 1;
+      let subtotal = total + desconto;
+      let preco = subtotal / qtd;
+      row.querySelector('.preco').value = preco.toFixed(2).replace('.', ',');
+      row.querySelector('.subtotal').textContent = `R$ ${subtotal.toFixed(2).replace('.', ',')}`;
+    } else {
+      // Edição de qtd, preco ou desconto: recalcular subtotal e total
+      let qtd = parseFloat(row.querySelector('.qtd').value.replace(',', '.')) || 0;
+      let preco = parseFloat(row.querySelector('.preco').value.replace(',', '.')) || 0;
+      let desconto = parseFloat(row.querySelector('.desconto').value.replace(',', '.')) || 0;
+      let subtotal = (qtd * preco).toFixed(2);
+      let total = (parseFloat(subtotal) - desconto).toFixed(2);
+      row.querySelector('.subtotal').textContent = `R$ ${subtotal.replace('.', ',')}`;
+      row.querySelector('.total').value = total.replace('.', ',');
+    }
+    updateProductTotals();
+  }
+
+  function updateProductTotals() {
+    const rows = document.querySelectorAll('#produtosTable tbody tr');
+    let totalProd = 0;
+    rows.forEach(row => {
+      totalProd += parseFloat(row.querySelector('.total').value.replace(',', '.')) || 0;
+    });
+    document.getElementById('totalProdutos').value = totalProd.toFixed(2).replace('.', ',');
+    totalNotaValue = totalProd + parseFloat(document.getElementById('valorFrete').value.replace(',', '.') || 0) + parseFloat(document.getElementById('outrasDespesas').value.replace(',', '.') || 0) - parseFloat(document.getElementById('desconto').value.replace(',', '.') || 0);
+    document.getElementById('totalNota').value = totalNotaValue.toFixed(2).replace('.', ',');
+    updateRemaining();
+  }
+
+  window.removeProductRow = (btn) => {
+    btn.closest('tr').remove();
+    updateProductTotals();
+  };
+
+  window.addDuplicataRow = (numero = duplicataCounter++, data = '', valor = '0.00') => {
+    const tbody = document.querySelector('#duplicatasTable tbody');
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${numero}</td>
+      <td><input type="text" class="editable dataVenc" value="${data}"></td>
+      <td><span>R$</span> <input type="text" class="editable valorDup" value="${valor.replace('.', ',')}"></td>
+      <td><button onclick="removeDuplicataRow(this)">Remover</button></td>
+    `;
+    tbody.appendChild(row);
+    row.querySelectorAll('.editable').forEach(el => el.addEventListener('input', updateRemaining));
+    updateRemaining();
+  };
+
+  window.removeDuplicataRow = (btn) => {
+    btn.closest('tr').remove();
+    updateRemaining();
+  };
+
+  function updateRemaining() {
+    const rows = document.querySelectorAll('#duplicatasTable tbody tr');
+    let sumDup = 0;
+    rows.forEach(row => {
+      sumDup += parseFloat(row.querySelector('.valorDup').value.replace(',', '.')) || 0;
+    });
+    const remaining = (totalNotaValue - sumDup).toFixed(2).replace('.', ',');
+    document.getElementById('remaining').textContent = `R$ ${remaining}`;
+  }
+
+  window.mapProduct = (select) => {
+    const row = select.closest('tr');
+    const selectedOption = select.options[select.selectedIndex];
+    if (selectedOption.value) {
+      // Atualiza o código para o barcode selecionado
+      row.querySelector('.codigo').value = selectedOption.value;
+      // Atualiza unidade e preço venda se desejado (opcional)
+      row.querySelector('.unid').value = selectedOption.dataset.unit === 'kilo' ? 'KG' : 'UN'; // Ajuste conforme necessário
+      row.querySelector('.precoVenda').value = selectedOption.dataset.price.replace('.', ',');
+      // Usuário pode ajustar qtd manualmente para conversão, se necessário
+      alert('Produto mapeado! Ajuste a quantidade se houver conversão necessária (ex: caixa para kg).');
+    }
+  };
+
+  window.confirmarNota = () => {
+    // Validação para evitar entradas vazias
+    const totalNota = document.getElementById('totalNota').value.trim();
+    if (!totalNota || parseFloat(totalNota.replace(',', '.')) <= 0) {
+      alert('Não é possível confirmar uma nota vazia ou sem valor. Carregue um XML válido primeiro.');
+      return;
+    }
+    // Collect data
+    notaData = {
+      filial: document.getElementById('filial').value,
+      fornecedor: document.getElementById('fornecedor').value,
+      modelo: document.getElementById('modelo').value,
+      serie: document.getElementById('serie').value,
+      numero: document.getElementById('numero').value,
+      dataEntrada: document.getElementById('dataEntrada').value,
+      dataEmissao: document.getElementById('dataEmissao').value,
+      totalNota: document.getElementById('totalNota').value,
+      produtos: [],
+      duplicatas: []
+    };
+    const prodRows = document.querySelectorAll('#produtosTable tbody tr');
+    prodRows.forEach(row => {
+      notaData.produtos.push({
+        ordem: row.cells[0].textContent,
+        id: row.cells[1].textContent,
+        codigo: row.querySelector('.codigo').value, // Usa o código editado ou mapeado
+        produto: row.cells[3].textContent,
+        qtd: row.querySelector('.qtd').value.replace(',', '.'),
+        unid: row.querySelector('.unid').value,
+        preco: row.querySelector('.preco').value.replace(',', '.'),
+        subtotal: row.querySelector('.subtotal').textContent.replace('R$ ', '').replace(',', '.'),
+        desconto: row.querySelector('.desconto').value.replace(',', '.'),
+        total: row.querySelector('.total').value.replace(',', '.'),
+        cfop: row.cells[10].textContent,
+        custo: row.querySelector('.custo').value.replace(',', '.'),
+        markup: row.querySelector('.markup').value.replace(',', '.'),
+        precoVenda: row.querySelector('.precoVenda').value.replace(',', '.'),
+        ncm: row.cells[14].textContent,
+        cs: row.querySelector('.cs').value,
+        mappedTo: row.querySelector('.mapTo').value // Salva o mapeamento se usado
+      });
+    });
+    const dupRows = document.querySelectorAll('#duplicatasTable tbody tr');
+    dupRows.forEach(row => {
+      notaData.duplicatas.push({
+        numero: row.cells[0].textContent,
+        dataVenc: row.querySelector('.dataVenc').value,
+        valor: row.querySelector('.valorDup').value.replace(',', '.')
+      });
+    });
+    const user = auth.currentUser;
+    if (user) {
+      const notasRef = ref(db, `notasEntradas/${user.uid}`);
+      const newNotaRef = push(notasRef);
+      set(newNotaRef, notaData).then(() => {
+        alert("Nota importada com sucesso!");
+        // Atualizar estoque dos produtos
+        const updates = {};
+        notaData.produtos.forEach(prod => {
+          const barcode = prod.mappedTo || prod.codigo; // Usa mapeado se existir
+          const productRef = ref(db, `produtos/${user.uid}/${barcode}`);
+          onValue(productRef, snapshot => {
+            let currentStock = 0;
+            let productData = {
+              nome: prod.produto,
+              preco: parseFloat(prod.precoVenda),
+              unidade: prod.unid.toLowerCase() === 'kg' ? 'kilo' : 'unidade',
+              estoque: 0
+            };
+            if (snapshot.exists()) {
+              const existing = snapshot.val();
+              currentStock = existing.estoque || 0;
+              productData = {
+                ...existing,
+                estoque: currentStock + parseFloat(prod.qtd)
+              };
+            } else {
+              productData.estoque = parseFloat(prod.qtd);
+            }
+            set(productRef, productData);
+          }, {
+            onlyOnce: true
+          });
+        });
+        document.getElementById('importSection').style.display = 'none';
+        document.getElementById('statusSection').style.display = 'block';
+        document.getElementById('notaStatus').textContent = 'Status: Aguardando Processamento';
+      }).catch(err => alert("Erro ao importar nota: " + err.message));
+    }
+  };
+  window.cancelarNota = () => {
+    // Reset form
+    const inputs = document.querySelectorAll('#importSection input[type="text"]');
+    inputs.forEach(input => input.value = '');
+    document.querySelector('#produtosTable tbody').innerHTML = '';
+    document.querySelector('#duplicatasTable tbody').innerHTML = '';
+    totalNotaValue = 0;
+    duplicataCounter = 1;
+    updateRemaining();
+  };
+
+  function renderNotesList() {
+    const list = document.getElementById('notesList');
+    list.innerHTML = '';
+    notes.forEach((nota, index) => {
+      const item = document.createElement('div');
+      item.className = 'note-item';
+      item.innerHTML = `
+        <input type="checkbox" ${nota.processed ? 'checked' : ''} onchange="processarNota(${index}, this)">
+        Nota ${nota.numero} - ${nota.fornecedor} - Total: ${nota.totalNota}
+        <button onclick="viewNota(${index})">Visualizar</button>
+        <button class="delete" onclick="excluirNota(${index})">Excluir</button>
+      `;
+      list.appendChild(item);
+    });
+  }
+  window.excluirNota = (index) => {
+    const nota = notes[index];
+    const user = auth.currentUser;
+    if (!user) return;
+    if (nota.processed) {
+      if (!confirm('Esta nota já foi processada e gerou contas a pagar. Tem certeza que deseja excluí-la? Isso também excluirá as contas associadas.')) {
+        return;
+      }
+    } else {
+      if (!confirm('Tem certeza que deseja excluir esta nota?')) {
+        return;
+      }
+    }
+    // Excluir a nota
+    const notaRef = ref(db, `notasEntradas/${user.uid}/${nota.id}`);
+    remove(notaRef)
+      .then(() => {
+        alert('Nota excluída com sucesso!');
+        // O listener onValue atualizará a lista automaticamente
+      })
+      .catch(err => alert('Erro ao excluir nota: ' + err.message));
+  };
+  window.processarNota = (index, checkbox) => {
+    const nota = notes[index];
+    const user = auth.currentUser;
+    if (user && checkbox.checked && !nota.processed) {
+      const contasPagarRef = ref(db, `contasPagar/${user.uid}`);
+      nota.duplicatas.forEach(dup => {
+        push(contasPagarRef, {
+          fornecedor: nota.fornecedor,
+          valor: parseFloat(dup.valor),
+          dataVenc: dup.dataVenc,
+          notaId: nota.id,
+          status: 'Pendente' // Adicionando status padrão
+        });
+      });
+      // Atualizar nota como processada
+      update(ref(db, `notasEntradas/${user.uid}/${nota.id}`), {
+        processed: true
+      });
+      document.getElementById('notaStatus').textContent = 'Status: Processado';
+      apGenerated = true;
+      loadAllApAndFilter(user.uid); // Atualiza a lista de contas a pagar
+    }
+  };
+  window.gerarOutraNota = () => {
+    document.getElementById('importSection').style.display = 'block';
+    document.getElementById('statusSection').style.display = 'none';
+    cancelarNota();
+  };
+  window.verContasAPagar = () => {
+    const user = auth.currentUser;
+    if (user) {
+      const apTbody = document.querySelector('#apTable tbody');
+      apTbody.innerHTML = '';
+      const contasRef = ref(db, `contasPagar/${user.uid}`);
+      onValue(contasRef, snapshot => {
+        if (snapshot.exists()) {
+          snapshot.forEach(child => {
+            const ap = child.val();
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${ap.fornecedor}</td>
+              <td>R$ ${parseFloat(ap.valor).toFixed(2).replace('.', ',')}</td>
+              <td>${ap.dataVenc}</td>
+            `;
+            apTbody.appendChild(row);
+          });
+        }
+        document.getElementById('apSection').style.display = 'block';
+      }, {
+        onlyOnce: true
+      });
+    }
+  };
+  window.viewNota = (index) => {
+    const nota = notes[index];
+    document.getElementById('noteInfo').innerHTML = `
+      <p><strong>Filial:</strong> ${nota.filial}</p>
+      <p><strong>Fornecedor:</strong> ${nota.fornecedor}</p>
+      <p><strong>Modelo:</strong> ${nota.modelo}</p>
+      <p><strong>Série:</strong> ${nota.serie}</p>
+      <p><strong>Número:</strong> ${nota.numero}</p>
+      <p><strong>Data Entrada:</strong> ${nota.dataEntrada}</p>
+      <p><strong>Data Emissão:</strong> ${nota.dataEmissao}</p>
+      <p><strong>Total da Nota:</strong> ${nota.totalNota}</p>
+    `;
+    const tbody = document.querySelector('#noteProductsTable tbody');
+    tbody.innerHTML = '';
+    nota.produtos.forEach(prod => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${prod.ordem}</td>
+        <td>${prod.id}</td>
+        <td>${prod.codigo}</td>
+        <td>${prod.produto}</td>
+        <td>${prod.qtd.replace('.', ',')}</td>
+        <td>${prod.unid}</td>
+        <td>R$ ${prod.preco.replace('.', ',')}</td>
+        <td>R$ ${prod.subtotal.replace('.', ',')}</td>
+        <td>R$ ${prod.desconto.replace('.', ',')}</td>
+        <td>R$ ${prod.total.replace('.', ',')}</td>
+        <td>${prod.cfop}</td>
+        <td>R$ ${prod.custo.replace('.', ',')}</td>
+        <td>${prod.markup.replace('.', ',')} %</td>
+        <td>R$ ${prod.precoVenda.replace('.', ',')}</td>
+        <td>${prod.ncm}</td>
+        <td>${prod.cs}</td>
+        <td>${prod.mappedTo || 'N/A'}</td>
+      `;
+      tbody.appendChild(row);
+    });
+    document.getElementById('noteDetails').style.display = 'block';
+  };
+  window.closeNoteDetails = () => {
+    document.getElementById('noteDetails').style.display = 'none';
+  };
+  window.printToPDF = () => {
+    const {
+      jsPDF
+    } = window.jspdf;
+    const doc = new jsPDF();
+    doc.text('Detalhes da Nota', 10, 10);
+    const noteInfo = document.getElementById('noteInfo').innerText;
+    doc.text(noteInfo, 10, 20);
+    doc.addPage();
+    doc.text('Produtos', 10, 10);
+    const table = document.getElementById('noteProductsTable');
+    const rows = [];
+    for (let i = 0; i < table.rows.length; i++) {
+      const cells = [];
+      for (let j = 0; j < table.rows[i].cells.length; j++) {
+        cells.push(table.rows[i].cells[j].innerText);
+      }
+      rows.push(cells);
+    }
+    doc.autoTable({
+      head: [rows[0]],
+      body: rows.slice(1),
+      startY: 20
+    });
+    doc.save('nota.pdf');
+  };
+  window.sortTable = (n) => {
+    var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+    table = document.getElementById("apTable");
+    switching = true;
+    dir = "asc";
+    while (switching) {
+      switching = false;
+      rows = table.rows;
+      for (i = 1; i < (rows.length - 1); i++) {
+        shouldSwitch = false;
+        x = rows[i].getElementsByTagName("TD")[n];
+        y = rows[i + 1].getElementsByTagName("TD")[n];
+        if (dir == "asc") {
+          if (getComparableValue(x.innerHTML.toLowerCase()) > getComparableValue(y.innerHTML.toLowerCase())) {
+            shouldSwitch = true;
+            break;
+          }
+        } else if (dir == "desc") {
+          if (getComparableValue(x.innerHTML.toLowerCase()) < getComparableValue(y.innerHTML.toLowerCase())) {
+            shouldSwitch = true;
+            break;
+          }
+        }
+      }
+      if (shouldSwitch) {
+        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+        switching = true;
+        switchcount++;
+      } else {
+        if (switchcount == 0 && dir == "asc") {
+          dir = "desc";
+          switching = true;
+        }
+      }
+    }
+  };
+
+  function getComparableValue(str) {
+    if (str.startsWith('r$')) {
+      return parseFloat(str.replace('r$ ', '').replace(',', '.'));
+    } else if (/^\d{2}\/\d{2}\/\d{4}$/.test(str)) {
+      const parts = str.split('/');
+      return new Date(parts[2], parts[1] - 1, parts[0]).getTime();
+    } else {
+      return str;
+    }
+  }
+  // --- Nova funcionalidade: Contas a Pagar ---
+  let allApData = [];
+  let filteredApData = [];
+  let apEditId = null;
+
+  function loadAllApAndFilter(uid) {
+    const apRef = ref(db, `contasPagar/${uid}`);
+    onValue(apRef, snapshot => {
+      allApData = [];
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        Object.entries(data).forEach(([key, item]) => {
+          allApData.push({
+            id: key,
+            ...item,
+            status: item.status || 'Pendente' // Garantir status padrão
+          });
+        });
+      }
+      applyApFiltersAndDisplay();
+    });
+  }
+
+  function applyApFiltersAndDisplay() {
+    const container = document.getElementById("apList");
+    container.innerHTML = "";
+    let currentTotalAp = 0;
+    const filterDateStartStr = document.getElementById("filterApDateStart").value;
+    const filterDateEndStr = document.getElementById("filterApDateEnd").value;
+    const filterFornecedor = document.getElementById("filterApFornecedor").value.trim().toLowerCase();
+    const filterStatus = document.getElementById("filterApStatus").value;
+    const filterDateStart = filterDateStartStr ? new Date(filterDateStartStr) : null;
+    const filterDateEnd = filterDateEndStr ? new Date(filterDateEndStr) : null;
+    filteredApData = allApData.filter(ap => {
+      const apDateParts = ap.dataVenc.split('/');
+      const apDate = new Date(`${apDateParts[2]}-${apDateParts[1]}-${apDateParts[0]}`);
+      const matchesDate = (!filterDateStart || apDate >= filterDateStart) &&
+        (!filterDateEnd || apDate <= filterDateEnd);
+      const matchesFornecedor = !filterFornecedor || ap.fornecedor.toLowerCase().includes(filterFornecedor);
+      const matchesStatus = (filterStatus === "Todos" || ap.status === filterStatus);
+      return matchesDate && matchesFornecedor && matchesStatus;
+    });
+    if (filteredApData.length > 0) {
+      const table = document.createElement("table");
+      table.style.width = "100%";
+      table.style.borderCollapse = "collapse";
+      table.innerHTML = `
+        <thead>
+          <tr>
+            <th>Fornecedor</th>
+            <th>Valor (R$)</th>
+            <th>Data Vencimento</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${filteredApData.map(ap => {
+            currentTotalAp += ap.valor;
+            return `
+              <tr class="ap-item">
+                <td>${ap.fornecedor}</td>
+                <td>${ap.valor.toFixed(2).replace('.', ',')}</td>
+                <td>${ap.dataVenc}</td>
+                <td>${ap.status}</td>
+                <td>
+                  <button class="edit" onclick="editarAp('${ap.id}')">Editar</button>
+                  <button class="delete" onclick="excluirAp('${ap.id}')">Excluir</button>
+                  ${ap.status === 'Pendente' ? `<button class="pay" onclick="marcarComoPago('${ap.id}')">Marcar como Pago</button>` : ''}
+                </td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      `;
+      container.appendChild(table);
+    } else {
+      container.innerHTML = "<p>Nenhuma conta a pagar encontrada com os filtros aplicados.</p>";
+    }
+    document.getElementById("totalApValue").textContent = `R$ ${currentTotalAp.toFixed(2).replace('.', ',')}`;
+  }
+  document.getElementById("applyApFiltersBtn").onclick = () => {
+    applyApFiltersAndDisplay();
+  };
+  document.getElementById("toggleApListBtn").onclick = () => {
+    const apListDiv = document.getElementById("apList");
+    const toggleBtn = document.getElementById("toggleApListBtn");
+    if (apListDiv.style.display === "none") {
+      apListDiv.style.display = "block";
+      toggleBtn.textContent = "Ocultar Contas a Pagar";
+    } else {
+      apListDiv.style.display = "none";
+      toggleBtn.textContent = "Mostrar Contas a Pagar";
+    }
+  };
+  window.editarAp = (id) => {
+    const user = auth.currentUser;
+    if (!user) return;
+    const apRef = ref(db, `contasPagar/${user.uid}/${id}`);
+    onValue(apRef, snapshot => {
+      if (snapshot.exists()) {
+        const ap = snapshot.val();
+        // Aqui você pode abrir um modal ou usar campos existentes para edição
+        // Por simplicidade, vamos usar prompt para editar
+        const newFornecedor = prompt("Fornecedor:", ap.fornecedor);
+        const newValor = parseFloat(prompt("Valor:", ap.valor));
+        const newDataVenc = prompt("Data Vencimento (DD/MM/AAAA):", ap.dataVenc);
+        if (newFornecedor && !isNaN(newValor) && newDataVenc) {
+          update(apRef, {
+            fornecedor: newFornecedor,
+            valor: newValor,
+            dataVenc: newDataVenc
+          }).then(() => alert("Conta atualizada!"));
+        }
+      }
+    }, {
+      onlyOnce: true
+    });
+  };
+  window.excluirAp = (id) => {
+    const user = auth.currentUser;
+    if (!user) return;
+    if (confirm("Tem certeza que deseja excluir esta conta a pagar?")) {
+      const apRef = ref(db, `contasPagar/${user.uid}/${id}`);
+      remove(apRef).then(() => alert("Conta excluída!"));
+    }
+  };
+  window.marcarComoPago = (id) => {
+    const user = auth.currentUser;
+    if (!user) return;
+    if (confirm("Marcar esta conta como paga?")) {
+      const apRef = ref(db, `contasPagar/${user.uid}/${id}`);
+      update(apRef, {
+        status: 'Pago'
+      }).then(() => alert("Conta marcada como paga!"));
+    }
+  };
+  document.getElementById("exportApPdfBtn").onclick = () => {
+    if (filteredApData.length === 0) {
+      alert("Não há contas a pagar para exportar.");
+      return;
+    }
+    const {
+      jsPDF
+    } = window.jspdf;
+    const doc = new jsPDF();
+    doc.setFontSize(16);
+    doc.text("Relatório de Contas a Pagar Filtradas", 10, 10);
+    const tableColumn = ["Fornecedor", "Valor (R$)", "Data Vencimento", "Status"];
+    const tableRows = filteredApData.map(ap => [
+      ap.fornecedor,
+      `R$ ${ap.valor.toFixed(2).replace('.', ',')}`,
+      ap.dataVenc,
+      ap.status
+    ]);
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+      startY: 20,
+      styles: {
+        fontSize: 8,
+        cellPadding: 2,
+        overflow: 'linebreak'
+      },
+      headStyles: {
+        fillColor: [41, 128, 185],
+        textColor: [255, 255, 255]
+      },
+      alternateRowStyles: {
+        fillColor: [240, 240, 240]
+      }
+    });
+    doc.save("relatorio_contas_pagar_filtradas.pdf");
+  };
+  // --- Funcionalidade de Adição Manual de Contas a Pagar ---
+  document.getElementById("addApBtn").onclick = () => {
+    const fornecedor = document.getElementById("newApFornecedor").value.trim();
+    const valor = parseFloat(document.getElementById("newApValor").value);
+    const dataVenc = document.getElementById("newApDataVenc").value;
+    if (!fornecedor || isNaN(valor) || valor <= 0 || !dataVenc) {
+      alert("Preencha todos os campos corretamente.");
+      return;
+    }
+    const formattedDataVenc = `${dataVenc.split('-')[2]}/${dataVenc.split('-')[1]}/${dataVenc.split('-')[0]}`;
+    const user = auth.currentUser;
+    if (user) {
+      const apRef = ref(db, `contasPagar/${user.uid}`);
+      const newApRef = push(apRef);
+      set(newApRef, {
+        fornecedor: fornecedor,
+        valor: valor,
+        dataVenc: formattedDataVenc,
+        status: 'Pendente'
+      }).then(() => {
+        alert("Conta a pagar adicionada com sucesso!");
+        document.getElementById("newApFornecedor").value = "";
+        document.getElementById("newApValor").value = "";
+        document.getElementById("newApDataVenc").value = "";
+      }).catch(err => alert("Erro ao adicionar conta: " + err.message));
+    }
+  };
+  // --- Funcionalidade de Inventário ---
+  let inventories = [];
+
+  function loadInventories(uid) {
+    const invRef = ref(db, `inventories/${uid}`);
+    onValue(invRef, snapshot => {
+      inventories = [];
+      if (snapshot.exists()) {
+        snapshot.forEach(child => {
+          inventories.push({
+            id: child.key,
+            processed: false,
+            ...child.val()
+          });
+        });
+      }
+      renderInventoriesList();
+    });
+  }
+  window.iniciarInventario = () => {
+    if (Object.keys(productsDatabase).length === 0) {
+      alert('Nenhum produto cadastrado para iniciar inventário.');
+      return;
+    }
+    const tbody = document.querySelector('#inventoryProductsTable tbody');
+    tbody.innerHTML = '';
+    Object.entries(productsDatabase).forEach(([barcode, prod]) => {
+      const unitDisplay = prod.unidade === 'kilo' ? 'kg' : 'un';
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${barcode}</td>
+        <td>${prod.nome}</td>
+        <td>${prod.unidade}</td>
+        <td>${(prod.estoque || 0).toFixed(3).replace('.', ',')} ${unitDisplay}</td>
+        <td><input type="number" class="counted" value="${(prod.estoque || 0).toFixed(3)}" step="0.001"></td>
+      `;
+      tbody.appendChild(row);
+    });
+    document.getElementById('inventoryProductsTable').style.display = 'block';
+    document.getElementById('inventoryButtons').style.display = 'flex';
+  };
+  window.confirmarInventario = () => {
+    const user = auth.currentUser;
+    if (!user) return;
+    const invData = {
+      date: new Date().toLocaleDateString('pt-BR'),
+      products: []
+    };
+    const rows = document.querySelectorAll('#inventoryProductsTable tbody tr');
+    let valid = true;
+    rows.forEach(row => {
+      const counted = parseFloat(row.querySelector('.counted').value);
+      if (isNaN(counted) || counted < 0) {
+        alert('Quantidades contadas devem ser números válidos e não negativas.');
+        valid = false;
+        return;
+      }
+      invData.products.push({
+        barcode: row.cells[0].textContent,
+        name: row.cells[1].textContent,
+        unit: row.cells[2].textContent,
+        current: parseFloat(row.cells[3].textContent.replace(',', '.')),
+        counted: counted
+      });
+    });
+    if (!valid) return;
+    const invRef = ref(db, `inventories/${user.uid}`);
+    const newInvRef = push(invRef);
+    set(newInvRef, {
+      processed: false,
+      ...invData
+    }).then(() => {
+      alert('Inventário salvo como pendente!');
+      cancelarInventario();
+      document.getElementById('inventoryForm').style.display = 'none';
+      document.getElementById('inventoryStatusSection').style.display = 'block';
+      document.getElementById('invStatus').textContent = 'Status: Aguardando Processamento';
+    }).catch(err => alert('Erro ao salvar inventário: ' + err.message));
+  };
+  window.cancelarInventario = () => {
+    document.querySelector('#inventoryProductsTable tbody').innerHTML = '';
+    document.getElementById('inventoryProductsTable').style.display = 'none';
+    document.getElementById('inventoryButtons').style.display = 'none';
+  };
+
+  function renderInventoriesList() {
+    const list = document.getElementById('inventoriesList');
+    list.innerHTML = '';
+    inventories.forEach((inv, index) => {
+      const item = document.createElement('div');
+      item.className = 'inventory-item';
+      item.innerHTML = `
+        <input type="checkbox" ${inv.processed ? 'checked' : ''} onchange="processarInventario(${index}, this)">
+        Inventário de ${inv.date}
+        <button onclick="viewInventario(${index})">Visualizar</button>
+        <button class="delete" onclick="excluirInventario(${index})">Excluir</button>
+      `;
+      list.appendChild(item);
+    });
+  }
+  window.excluirInventario = (index) => {
+    const inv = inventories[index];
+    const user = auth.currentUser;
+    if (!user) return;
+    if (inv.processed) {
+      if (!confirm('Este inventário já foi processado e atualizou o estoque. Tem certeza que deseja excluí-lo?')) {
+        return;
+      }
+    } else {
+      if (!confirm('Tem certeza que deseja excluir este inventário?')) {
+        return;
+      }
+    }
+    const invRef = ref(db, `inventories/${user.uid}/${inv.id}`);
+    remove(invRef)
+      .then(() => {
+        alert('Inventário excluído com sucesso!');
+      })
+      .catch(err => alert('Erro ao excluir inventário: ' + err.message));
+  };
+  window.processarInventario = (index, checkbox) => {
+    const inv = inventories[index];
+    const user = auth.currentUser;
+    if (user && checkbox.checked && !inv.processed) {
+      const updates = {};
+      inv.products.forEach(prod => {
+        updates[`produtos/${user.uid}/${prod.barcode}/estoque`] = prod.counted;
+      });
+      update(ref(db), updates).then(() => {
+        update(ref(db, `inventories/${user.uid}/${inv.id}`), {
+          processed: true
+        });
+        alert('Inventário processado e estoque atualizado!');
+        loadProductsFromDatabase(user.uid);
+      }).catch(err => alert('Erro ao processar inventário: ' + err.message));
+    }
+  };
+  window.gerarOutroInventario = () => {
+    document.getElementById('inventoryForm').style.display = 'block';
+    document.getElementById('inventoryStatusSection').style.display = 'none';
+    cancelarInventario();
+  };
+  window.viewInventario = (index) => {
+    const inv = inventories[index];
+    document.getElementById('inventoryInfo').innerHTML = `
+      <p><strong>Data:</strong> ${inv.date}</p>
+      <p><strong>Processado:</strong> ${inv.processed ? 'Sim' : 'Não'}</p>
+    `;
+    const tbody = document.querySelector('#inventoryProductsDetailTable tbody');
+    tbody.innerHTML = '';
+    inv.products.forEach(prod => {
+      const diff = prod.counted - prod.current;
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${prod.barcode}</td>
+        <td>${prod.name}</td>
+        <td>${prod.unit}</td>
+        <td>${prod.current.toFixed(3).replace('.', ',')}</td>
+        <td>${prod.counted.toFixed(3).replace('.', ',')}</td>
+        <td>${diff.toFixed(3).replace('.', ',')}</td>
+      `;
+      tbody.appendChild(row);
+    });
+    document.getElementById('inventoryDetails').style.display = 'block';
+  };
+  window.closeInventoryDetails = () => {
+    document.getElementById('inventoryDetails').style.display = 'none';
+  };
+  // --- Funcionalidades de Clientes ---
+  let customersDatabase = {};
+
+  function loadCustomersFromDatabase(uid) {
+    const clientesRef = ref(db, `clientes/${uid}`);
+    onValue(clientesRef, snapshot => {
+      customersDatabase = {};
+      if (snapshot.exists()) {
+        customersDatabase = snapshot.val();
+      }
+      displayCustomers();
+    });
+  }
+  document.getElementById("addCustomerBtn").onclick = () => {
+    const id = document.getElementById("customerId").value.trim();
+    const nome = document.getElementById("customerNome").value.trim();
+    const dataNasc = document.getElementById("customerDataNasc").value;
+    const cpfRg = document.getElementById("customerCpfRg").value.trim();
+    const telefone = document.getElementById("customerTelefone").value.trim();
+    if (!nome || !dataNasc || !cpfRg || !telefone) {
+      alert("Preencha todos os campos do cliente.");
+      return;
+    }
+    const user = auth.currentUser;
+    if (user) {
+      const customerId = id || push(ref(db, `clientes/${user.uid}`)).key;
+      const customerData = {
+        nome,
+        dataNascimento: dataNasc,
+        cpfRg,
+        telefone
+      };
+      set(ref(db, `clientes/${user.uid}/${customerId}`), customerData)
+        .then(() => {
+          alert("Cliente salvo com sucesso!");
+          resetCustomerForm();
+        })
+        .catch(err => alert("Erro ao salvar cliente: " + err.message));
+    }
+  };
+
+  function displayCustomers() {
+    const customerListDiv = document.getElementById("customerList");
+    customerListDiv.innerHTML = "";
+    if (Object.keys(customersDatabase).length === 0) {
+      customerListDiv.innerHTML = "<p>Nenhum cliente cadastrado.</p>";
+      return;
+    }
+    const table = document.createElement("table");
+    table.innerHTML = `
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Data Nascimento</th>
+          <th>CPF/RG</th>
+          <th>Telefone</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${Object.entries(customersDatabase).map(([id, customer]) => `
+          <tr>
+            <td>${customer.nome}</td>
+            <td>${customer.dataNascimento}</td>
+            <td>${customer.cpfRg}</td>
+            <td>${customer.telefone}</td>
+            <td class="customer-actions">
+              <span class="whatsapp-icon" onclick="openWhatsApp('${customer.telefone}')"></span>
+              <span class="edit-icon" onclick="editCustomer('${id}')"></span>
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    `;
+    customerListDiv.appendChild(table);
+  }
+  window.editCustomer = (id) => {
+    const customer = customersDatabase[id];
+    if (customer) {
+      document.getElementById("customerId").value = id;
+      document.getElementById("customerNome").value = customer.nome;
+      document.getElementById("customerDataNasc").value = customer.dataNascimento;
+      document.getElementById("customerCpfRg").value = customer.cpfRg;
+      document.getElementById("customerTelefone").value = customer.telefone;
+      document.getElementById("addCustomerBtn").textContent = "Atualizar Cliente";
+    }
+  };
+  window.openWhatsApp = (telefone) => {
+    window.open(`https://wa.me/${telefone}`, '_blank');
+  };
+
+  function resetCustomerForm() {
+    document.getElementById("customerId").value = "";
+    document.getElementById("customerNome").value = "";
+    document.getElementById("customerDataNasc").value = "";
+    document.getElementById("customerCpfRg").value = "";
+    document.getElementById("customerTelefone").value = "";
+    document.getElementById("addCustomerBtn").textContent = "Salvar Cliente";
+  }
+  document.getElementById("toggleCustomerListBtn").onclick = () => {
+    const customerListDiv = document.getElementById("customerList");
+    const toggleBtn = document.getElementById("toggleCustomerListBtn");
+    if (customerListDiv.style.display === "none") {
+      customerListDiv.style.display = "block";
+      toggleBtn.textContent = "Ocultar Clientes";
+    } else {
+      customerListDiv.style.display = "none";
+      toggleBtn.textContent = "Mostrar Clientes";
+    }
+  };
+  // --- Funcionalidade de Contas a Receber ---
+  let allArData = [];
+  let filteredArData = [];
+
+  function loadAllArAndFilter(uid) {
+    const arRef = ref(db, `contasReceber/${uid}`);
+    onValue(arRef, snapshot => {
+      allArData = [];
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        Object.entries(data).forEach(([key, item]) => {
+          allArData.push({
+            id: key,
+            ...item,
+            status: item.status || 'Pendente'
+          });
+        });
+      }
+      applyArFiltersAndDisplay();
+    });
+  }
+
+  function applyArFiltersAndDisplay() {
+    const container = document.getElementById("arList");
+    container.innerHTML = "";
+    let currentTotalAr = 0;
+    const filterDateStartStr = document.getElementById("filterArDateStart").value;
+    const filterDateEndStr = document.getElementById("filterArDateEnd").value;
+    const filterCliente = document.getElementById("filterArCliente").value.trim().toLowerCase();
+    const filterStatus = document.getElementById("filterArStatus").value;
+    const filterDateStart = filterDateStartStr ? new Date(filterDateStartStr) : null;
+    const filterDateEnd = filterDateEndStr ? new Date(filterDateEndStr) : null;
+    filteredArData = allArData.filter(ar => {
+      const arDateParts = ar.dataVenc.split('/');
+      const arDate = new Date(`${arDateParts[2]}-${arDateParts[1]}-${arDateParts[0]}`);
+      const matchesDate = (!filterDateStart || arDate >= filterDateStart) &&
+        (!filterDateEnd || arDate <= filterDateEnd);
+      const matchesCliente = !filterCliente || ar.cliente.toLowerCase().includes(filterCliente);
+      const matchesStatus = (filterStatus === "Todos" || ar.status === filterStatus);
+      return matchesDate && matchesCliente && matchesStatus;
+    });
+    if (filteredArData.length > 0) {
+      const table = document.createElement("table");
+      table.innerHTML = `
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th>Valor (R$)</th>
+            <th>Data Vencimento</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${filteredArData.map(ar => {
+            currentTotalAr += ar.valor;
+            return `
+              <tr class="ar-item">
+                <td>${ar.cliente}</td>
+                <td>${ar.valor.toFixed(2).replace('.', ',')}</td>
+                <td>${ar.dataVenc}</td>
+                <td>${ar.status}</td>
+                <td>
+                  <button class="edit" onclick="editarAr('${ar.id}')">Editar</button>
+                  <button class="delete" onclick="excluirAr('${ar.id}')">Excluir</button>
+                  ${ar.status === 'Pendente' ? `<button class="pay" onclick="marcarArComoPago('${ar.id}')">Marcar como Pago</button>` : ''}
+                </td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      `;
+      container.appendChild(table);
+    } else {
+      container.innerHTML = "<p>Nenhuma conta a receber encontrada com os filtros aplicados.</p>";
+    }
+    document.getElementById("totalArValue").textContent = `R$ ${currentTotalAr.toFixed(2).replace('.', ',')}`;
+  }
+  document.getElementById("applyArFiltersBtn").onclick = () => {
+    applyArFiltersAndDisplay();
+  };
+  document.getElementById("toggleArListBtn").onclick = () => {
+    const arListDiv = document.getElementById("arList");
+    const toggleBtn = document.getElementById("toggleArListBtn");
+    if (arListDiv.style.display === "none") {
+      arListDiv.style.display = "block";
+      toggleBtn.textContent = "Ocultar Contas a Receber";
+    } else {
+      arListDiv.style.display = "none";
+      toggleBtn.textContent = "Mostrar Contas a Receber";
+    }
+  };
+  window.editarAr = (id) => {
+    const user = auth.currentUser;
+    if (!user) return;
+    const arRef = ref(db, `contasReceber/${user.uid}/${id}`);
+    onValue(arRef, snapshot => {
+      if (snapshot.exists()) {
+        const ar = snapshot.val();
+        const newCliente = prompt("Cliente:", ar.cliente);
+        const newValor = parseFloat(prompt("Valor:", ar.valor));
+        const newDataVenc = prompt("Data Vencimento (DD/MM/AAAA):", ar.dataVenc);
+        if (newCliente && !isNaN(newValor) && newDataVenc) {
+          update(arRef, {
+            cliente: newCliente,
+            valor: newValor,
+            dataVenc: newDataVenc
+          }).then(() => alert("Conta atualizada!"));
+        }
+      }
+    }, {
+      onlyOnce: true
+    });
+  };
+  window.excluirAr = (id) => {
+    const user = auth.currentUser;
+    if (!user) return;
+    if (confirm("Tem certeza que deseja excluir esta conta a receber?")) {
+      const arRef = ref(db, `contasReceber/${user.uid}/${id}`);
+      remove(arRef).then(() => alert("Conta excluída!"));
+    }
+  };
+  window.marcarArComoPago = (id) => {
+    const user = auth.currentUser;
+    if (!user) return;
+    if (confirm("Marcar esta conta como paga?")) {
+      const arRef = ref(db, `contasReceber/${user.uid}/${id}`);
+      update(arRef, {
+        status: 'Pago'
+      }).then(() => alert("Conta marcada como paga!"));
+    }
+  };
+  document.getElementById("addArBtn").onclick = () => {
+    const cliente = document.getElementById("newArCliente").value.trim();
+    const valor = parseFloat(document.getElementById("newArValor").value);
+    const dataVenc = document.getElementById("newArDataVenc").value;
+    if (!cliente || isNaN(valor) || valor <= 0 || !dataVenc) {
+      alert("Preencha todos os campos corretamente.");
+      return;
+    }
+    const formattedDataVenc = `${dataVenc.split('-')[2]}/${dataVenc.split('-')[1]}/${dataVenc.split('-')[0]}`;
+    const user = auth.currentUser;
+    if (user) {
+      const arRef = ref(db, `contasReceber/${user.uid}`);
+      const newArRef = push(arRef);
+      set(newArRef, {
+        cliente,
+        valor,
+        dataVenc: formattedDataVenc,
+        status: 'Pendente'
+      }).then(() => {
+        alert("Conta a receber adicionada com sucesso!");
+        document.getElementById("newArCliente").value = "";
+        document.getElementById("newArValor").value = "";
+        document.getElementById("newArDataVenc").value = "";
+      }).catch(err => alert("Erro ao adicionar conta: " + err.message));
+    }
+  };
+  document.getElementById("exportArPdfBtn").onclick = () => {
+    if (filteredArData.length === 0) {
+      alert("Não há contas a receber para exportar.");
+      return;
+    }
+    const {
+      jsPDF
+    } = window.jspdf;
+    const doc = new jsPDF();
+    doc.setFontSize(16);
+    doc.text("Relatório de Contas a Receber Filtradas", 10, 10);
+    const tableColumn = ["Cliente", "Valor (R$)", "Data Vencimento", "Status"];
+    const tableRows = filteredArData.map(ar => [
+      ar.cliente,
+      `R$ ${ar.valor.toFixed(2).replace('.', ',')}`,
+      ar.dataVenc,
+      ar.status
+    ]);
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+      startY: 20
+    });
+    doc.save("relatorio_contas_receber.pdf");
+  };
+  // --- Funcionalidades de Fornecedores ---
+  let suppliersDatabase = {};
+
+  function loadSuppliersFromDatabase(uid) {
+    const fornecedoresRef = ref(db, `fornecedores/${uid}`);
+    onValue(fornecedoresRef, snapshot => {
+      suppliersDatabase = {};
+      if (snapshot.exists()) {
+        suppliersDatabase = snapshot.val();
+      }
+      displaySuppliers();
+    });
+  }
+  document.getElementById("addSupplierBtn").onclick = () => {
+    const id = document.getElementById("supplierId").value.trim();
+    const nome = document.getElementById("supplierNome").value.trim();
+    const cnpj = document.getElementById("supplierCnpj").value.trim();
+    const telefone = document.getElementById("supplierTelefone").value.trim();
+    if (!nome || !cnpj || !telefone) {
+      alert("Preencha todos os campos do fornecedor.");
+      return;
+    }
+    const user = auth.currentUser;
+    if (user) {
+      const supplierId = id || push(ref(db, `fornecedores/${user.uid}`)).key;
+      const supplierData = {
+        nome,
+        cnpj,
+        telefone
+      };
+      set(ref(db, `fornecedores/${user.uid}/${supplierId}`), supplierData)
+        .then(() => {
+          alert("Fornecedor salvo com sucesso!");
+          resetSupplierForm();
+        })
+        .catch(err => alert("Erro ao salvar fornecedor: " + err.message));
+    }
+  };
+
+  function displaySuppliers() {
+    const supplierListDiv = document.getElementById("supplierList");
+    supplierListDiv.innerHTML = "";
+    if (Object.keys(suppliersDatabase).length === 0) {
+      supplierListDiv.innerHTML = "<p>Nenhum fornecedor cadastrado.</p>";
+      return;
+    }
+    const table = document.createElement("table");
+    table.innerHTML = `
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>CNPJ</th>
+          <th>Telefone</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${Object.entries(suppliersDatabase).map(([id, supplier]) => `
+          <tr>
+            <td>${supplier.nome}</td>
+            <td>${supplier.cnpj}</td>
+            <td>${supplier.telefone}</td>
+            <td>
+              <span class="edit-icon" onclick="editSupplier('${id}')"></span>
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    `;
+    supplierListDiv.appendChild(table);
+  }
+  window.editSupplier = (id) => {
+    const supplier = suppliersDatabase[id];
+    if (supplier) {
+      document.getElementById("supplierId").value = id;
+      document.getElementById("supplierNome").value = supplier.nome;
+      document.getElementById("supplierCnpj").value = supplier.cnpj;
+      document.getElementById("supplierTelefone").value = supplier.telefone;
+      document.getElementById("addSupplierBtn").textContent = "Atualizar Fornecedor";
+    }
+  };
+
+  function resetSupplierForm() {
+    document.getElementById("supplierId").value = "";
+    document.getElementById("supplierNome").value = "";
+    document.getElementById("supplierCnpj").value = "";
+    document.getElementById("supplierTelefone").value = "";
+    document.getElementById("addSupplierBtn").textContent = "Salvar Fornecedor";
+  }
+  document.getElementById("toggleSupplierListBtn").onclick = () => {
+    const supplierListDiv = document.getElementById("supplierList");
+    const toggleBtn = document.getElementById("toggleSupplierListBtn");
+    if (supplierListDiv.style.display === "none") {
+      supplierListDiv.style.display = "block";
+      toggleBtn.textContent = "Ocultar Fornecedores";
+    } else {
+      supplierListDiv.style.display = "none";
+      toggleBtn.textContent = "Mostrar Fornecedores";
+    }
+  };
+</script>  </body>
 
 </html>
+
