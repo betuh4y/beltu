@@ -4147,8 +4147,8 @@
             <td>${customer.cpfRg}</td>
             <td>${customer.telefone}</td>
             <td class="customer-actions">
-              <span class="whatsapp-icon" onclick="openWhatsApp('${customer.telefone}')"></span>
-              <span class="edit-icon" onclick="editCustomer('${id}')"></span>
+              <span class="whatsapp-icon" onclick="openWhatsApp('${customer.telefone}')">📱</span>
+              <span class="edit-icon" onclick="editCustomer('${id}')">✏️</span>
             </td>
           </tr>
         `).join('')}
@@ -4435,8 +4435,9 @@
             <td>${supplier.nome}</td>
             <td>${supplier.cnpj}</td>
             <td>${supplier.telefone}</td>
-            <td>
-              <span class="edit-icon" onclick="editSupplier('${id}')"></span>
+            <td class="customer-actions">
+              <span class="whatsapp-icon" onclick="openWhatsApp('${supplier.telefone}')">📱</span>
+              <span class="edit-icon" onclick="editSupplier('${id}')">✏️</span>
             </td>
           </tr>
         `).join('')}
@@ -4476,4 +4477,3 @@
 </script>  </body>
 
 </html>
-
